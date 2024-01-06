@@ -27,27 +27,24 @@ public class Lexer
         char currentChar;
         for (int i = 0; i < incomingLines.size(); i++)
         {
-            int startIndex = 0;
             currentLine = incomingLines.get(i);
 
             for (int j = 0; j < currentLine.length(); j++)
             {
-                currentChar = currentLine.charAt(j);
-
-                if (Character.isWhitespace(currentChar))
+                if (Character.isSpaceChar(currentLine.charAt(j)))
                 {
-                    j += iterateOverWhitespace(currentLine, startIndex);
+                    j = iterateOverWhitespace(currentLine, j);
                 }
 
-                startIndex = j;
+                currentChar = currentLine.charAt(j);
 
                 if (Character.isDigit(currentChar) || currentChar == '.')
                 {
-                    j = handleToken(currentLine, startIndex, tokenType.NUMBER);
+                    j = handleToken(currentLine, j, tokenType.NUMBER);
                 }
                 else if (Character.isLetter(currentChar))
                 {
-                    j = handleToken(currentLine, startIndex, tokenType.WORD);
+                    j = handleToken(currentLine, j, tokenType.WORD);
                 }
             }
             handleEOL();
@@ -58,19 +55,19 @@ public class Lexer
      * Creates one Token, starting in the incoming line, at the incoming index, with the incoming tokenType.
      *
      * @param currentLine Incoming line.
-     * @param startIndex Incoming index.
+     * @param currentIndex Incoming index.
      * @param currentTokenType Incoming tokenType.
      * @return Number of indices iterated over.
      * @throws SecondDecimalPointException If a second decimal point is detected in a real number.
      */
-    private int handleToken(String currentLine, int startIndex, tokenType currentTokenType) throws SecondDecimalPointException
+    private int handleToken(String currentLine, int currentIndex, tokenType currentTokenType) throws SecondDecimalPointException
     {
-        String currentValue = "" + currentLine.charAt(startIndex);
+        String currentValue = "" + currentLine.charAt(currentIndex);
         char currentChar;
-        int returnIndex = startIndex + 1;
+        int returnIndex = currentIndex + 1;
         boolean hasDecimalPoint = isRealNumber(currentTokenType, currentLine.charAt(0));
 
-        for (int i = startIndex + 1; i < currentLine.length(); i++)
+        for (int i = currentIndex + 1; i < currentLine.length(); i++)
         {
             currentChar = currentLine.charAt(i);
 
@@ -149,7 +146,7 @@ public class Lexer
         for (int i = currentIndex; i < currentLine.length() && Character.isSpaceChar(currentChar); i++)
         {
             currentChar = currentLine.charAt(i);
-            currentIndex += i;
+            currentIndex = i;
         }
         return currentIndex;
     }

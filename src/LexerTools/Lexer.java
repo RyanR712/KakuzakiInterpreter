@@ -5,14 +5,22 @@
 package LexerTools;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Lexer
 {
     private final ArrayList<Token> tokenList;
+    private final HashMap<String, tokenType> keywordMap;
+
+    private boolean isComment;
 
     public Lexer()
     {
         tokenList = new ArrayList<>();
+        keywordMap = new HashMap<>();
+        initializeKeywordMap();
+
+        isComment = false;
     }
 
     /**
@@ -31,24 +39,44 @@ public class Lexer
 
             for (int j = 0; j < currentLine.length(); j++)
             {
-                if (Character.isSpaceChar(currentLine.charAt(j)))
+                if (!isComment)
                 {
-                    j = iterateOverWhitespace(currentLine, j);
-                }
+                    if (Character.isSpaceChar(currentLine.charAt(j)))
+                    {
+                        j = iterateOverWhitespace(currentLine, j);
+                    }
 
-                currentChar = currentLine.charAt(j);
+                    currentChar = currentLine.charAt(j);
 
-                if (Character.isDigit(currentChar) || currentChar == '.')
-                {
-                    j = handleToken(currentLine, j, tokenType.NUMBER);
+                    if (Character.isDigit(currentChar) || currentChar == '.')
+                    {
+                        j = handleToken(currentLine, j, tokenType.NUMBER);
+                    }
+                    else if (Character.isLetter(currentChar))
+                    {
+                        j = handleToken(currentLine, j, tokenType.WORD);
+                    }
+                    else if (currentChar == '{')
+                    {
+                        isComment = true;
+                    }
                 }
-                else if (Character.isLetter(currentChar))
+                else if (currentLine.charAt(j) == '}')
                 {
-                    j = handleToken(currentLine, j, tokenType.WORD);
+                    isComment = false;
                 }
             }
             handleEOL();
         }
+    }
+
+    /**
+     * Returns the Lexer's token list.
+     * @return The Lexer's token list.
+     */
+    public ArrayList<Token> getTokenList()
+    {
+        return tokenList;
     }
 
     /**
@@ -86,7 +114,14 @@ public class Lexer
             returnIndex++;
             currentValue += currentChar;
         }
-        tokenList.add(new Token(currentTokenType, currentValue));
+        if (keywordMap.containsKey(currentValue))
+        {
+            tokenList.add(new Token(keywordMap.get(currentValue)));
+        }
+        else
+        {
+            tokenList.add(new Token(currentTokenType, currentValue));
+        }
         return returnIndex;
     }
 
@@ -95,7 +130,10 @@ public class Lexer
      */
     private void handleEOL()
     {
-        tokenList.add(new Token());
+        if (!isComment)
+        {
+            tokenList.add(new Token());
+        }
     }
 
     /**
@@ -152,11 +190,34 @@ public class Lexer
     }
 
     /**
-     * Returns the Lexer's token list.
-     * @return The Lexer's token list.
+     * Maps each Kakuzaki keyword to a tokenType as written in tokenType.java.
      */
-    public ArrayList<Token> getTokenList()
+    private void initializeKeywordMap()
     {
-        return tokenList;
+        keywordMap.put("define", tokenType.DEFINE);
+        keywordMap.put("constants", tokenType.CONSTANTS);
+        keywordMap.put("variables", tokenType.VARIABLES);
+
+        keywordMap.put("if", tokenType.IF);
+        keywordMap.put("elsif", tokenType.ELSIF);
+        keywordMap.put("else", tokenType.ELSE);
+        keywordMap.put("then", tokenType.THEN);
+
+        keywordMap.put("while", tokenType.WHILE);
+        keywordMap.put("repeat", tokenType.REPEAT);
+        keywordMap.put("until", tokenType.UNTIL);
+        keywordMap.put("for", tokenType.FOR);
+        keywordMap.put("from", tokenType.FROM);
+        keywordMap.put("to", tokenType.TO);
+
+        keywordMap.put("integer", tokenType.INTEGER);
+        keywordMap.put("real", tokenType.REAL);
+        keywordMap.put("boolean", tokenType.BOOLEAN);
+        keywordMap.put("character", tokenType.CHARACTER);
+        keywordMap.put("string", tokenType.STRING);
+        keywordMap.put("array", tokenType.ARRAY);
+
+        keywordMap.put("var", tokenType.VAR);
+        keywordMap.put("mod", tokenType.MOD);
     }
 }

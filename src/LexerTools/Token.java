@@ -17,7 +17,16 @@ public class Token
     public Token()
     {
         type = tokenType.EOL;
-        value = "ENDOFLINE";
+    }
+
+    /**
+     * Constructs a Token with the incoming tokenType and no value String.
+     *
+     * @param incomingType Incoming tokenType.
+     */
+    public Token(tokenType incomingType)
+    {
+        type = incomingType;
     }
 
     /**
@@ -74,11 +83,12 @@ public class Token
 
     /**
      * Creates and returns this Token in the format {tokenType}({value String}).
+     * If the value String is null, then only the tokenType is printed.
      *
      * @return This Token in the above format.
      */
     public String toString()
     {
-        return type + "(" + value + ") ";
+        return value == null ? type + "" : type + "(" + value + ")";
     }
 }

@@ -4,4 +4,14 @@
 
 package LexerTools;
 
-public enum tokenType {WORD, NUMBER, EOL}
+public enum tokenType
+{
+    WORD, NUMBER, EOL,
+    INDENT, DEDENT,
+    DEFINE, CONSTANTS, VARIABLES,
+    IF, ELSIF, ELSE, THEN,
+    WHILE, REPEAT, UNTIL, FOR, FROM, TO,
+    INTEGER, REAL, BOOLEAN, CHARACTER, STRING, ARRAY,
+    CHARLITERAL, STRINGLITERAL,
+    VAR, MOD
+}

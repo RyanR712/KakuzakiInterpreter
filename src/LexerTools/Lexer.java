@@ -2,9 +2,6 @@ package LexerTools;
 
 import java.util.ArrayList;
 
-import LexerTools.SecondDecimalPointException;
-import LexerTools.tokenType;
-
 public class Lexer
 {
     private final ArrayList<Token> tokenList;

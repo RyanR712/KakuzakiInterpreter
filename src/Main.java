@@ -1,3 +1,13 @@
+/**
+ * Interprets programs according to the supplied language definition.
+ * <p></p>
+ * I am the author for all the code in this repository.
+ *
+ * @author Ryan R
+ */
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,13 +17,20 @@ import java.nio.charset.StandardCharsets;
 import LexerTools.Lexer;
 import LexerTools.Token;
 import LexerTools.tokenType;
+
 public class Main
 {
-    public static void main(String[] args) throws Exception
+    /**
+     * Runs each of the stages of the interpreter, in this order:
+     * Lexing, Parsing, Semantic Analysis, Interpreting
+     * @param args File name sent to Main.java.
+     * @throws IOException If no file ending in ".zki" is found.
+     */
+    public static void main(String[] args) throws IOException
     {
         if (args.length != 1 || !args[0].contains(".zki"))
         {
-            throw new Exception("Please submit a valid filename as the only argument to Kakuzaki," +
+            throw new FileNotFoundException("Please submit a valid filename as the only argument to Kakuzaki," +
                     "and include, specifically, a .zki file extension.");
         }
         else
@@ -36,6 +53,12 @@ public class Main
         }
     }
 
+    /**
+     * Prints the incoming token list to console in a sensible format.
+     * <p></p>
+     * Since this method will not be useful past the lexing stage, it will be marked deprecated then.
+     * @param tokenList Incoming token list.
+     */
     private static void printTokens(ArrayList<Token> tokenList)
     {
         for (int i = 0; i < tokenList.size(); i++)

@@ -1,9 +1,16 @@
-hello 42.3
-hi
-41.323
-{ hellooo
-423123
-555           }
+define hello
+    1 + 1
+    1 / 4
+    3 mod 3
+    1 * 99
+    44 - 4
+    1 and 3
+    2.6704218 or 8124076.2
+    3 not 1
+    2 < 3
+    8 > 7
 
-{no output }
-41421412414124.3 var while for until repeat 22
+define goodbye
+    variables goodbyeMessage : string
+            write string
+shouldFollowThreeDedents

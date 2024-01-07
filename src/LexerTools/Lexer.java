@@ -11,16 +11,24 @@ public class Lexer
 {
     private final ArrayList<Token> tokenList;
     private final HashMap<String, tokenType> keywordMap;
+    private final HashMap<String, tokenType> punctuationMap;
 
+    private int lineNumber;
+    private int currentIndentLevel;
     private boolean isComment;
+    private boolean indentsHandled;
 
     public Lexer()
     {
         tokenList = new ArrayList<>();
         keywordMap = new HashMap<>();
-        initializeKeywordMap();
+        punctuationMap = new HashMap<>();
+        initializeMaps();
 
+        lineNumber = 1;
+        currentIndentLevel = 0;
         isComment = false;
+        indentsHandled = false;
     }
 
     /**
@@ -41,7 +49,12 @@ public class Lexer
             {
                 if (!isComment)
                 {
-                    if (Character.isSpaceChar(currentLine.charAt(j)))
+                    if(!indentsHandled)
+                    {
+                        iterateOverIndents(currentLine);
+                    }
+
+                    if (indentsHandled && Character.isSpaceChar(currentLine.charAt(j)))
                     {
                         j = iterateOverWhitespace(currentLine, j);
                     }
@@ -52,7 +65,7 @@ public class Lexer
                     {
                         j = handleToken(currentLine, j, tokenType.NUMBER);
                     }
-                    else if (Character.isLetter(currentChar))
+                    else if (Character.isLetter(currentChar) || punctuationMap.containsKey("" + currentChar))
                     {
                         j = handleToken(currentLine, j, tokenType.WORD);
                     }
@@ -114,13 +127,13 @@ public class Lexer
             returnIndex++;
             currentValue += currentChar;
         }
-        if (keywordMap.containsKey(currentValue))
+        if (anyMapContains(currentValue))
         {
-            tokenList.add(new Token(keywordMap.get(currentValue)));
+            tokenList.add(new Token(getFromSomeMap(currentValue), lineNumber));
         }
         else
         {
-            tokenList.add(new Token(currentTokenType, currentValue));
+            tokenList.add(new Token(currentTokenType, currentValue, lineNumber));
         }
         return returnIndex;
     }
@@ -132,8 +145,10 @@ public class Lexer
     {
         if (!isComment)
         {
-            tokenList.add(new Token());
+            tokenList.add(new Token(lineNumber));
         }
+        lineNumber++;
+        indentsHandled = false;
     }
 
     /**
@@ -190,6 +205,79 @@ public class Lexer
     }
 
     /**
+     * Iterates over indents in the incoming line String and updates globals accordingly.
+     *
+     * @param currentLine Incoming line String.
+     */
+    private void iterateOverIndents(String currentLine)
+    {
+        final int SPACES_PER_TAB = 4;
+
+        int spaceLevel;
+        int newIndentLevel = 0;
+        char currentChar = currentLine.charAt(0);
+
+        for (int i = 0; i < currentLine.length() && (Character.isWhitespace(currentChar)); i++)
+        {
+            if (currentChar == '\t')
+            {
+                newIndentLevel++;
+            }
+            else if (Character.isSpaceChar(currentChar))
+            {
+                spaceLevel = iterateOverWhitespace(currentLine, i);
+                i += spaceLevel;
+                newIndentLevel += spaceLevel / SPACES_PER_TAB;
+            }
+            currentChar = currentLine.charAt(i);
+        }
+
+        if(newIndentLevel != currentIndentLevel)
+        {
+            tokenType dentType = newIndentLevel > currentIndentLevel ? tokenType.INDENT : tokenType.DEDENT;
+            int numberOfPrints = dentType == tokenType.INDENT ? newIndentLevel - currentIndentLevel : Math.abs(newIndentLevel - currentIndentLevel);
+
+            for (int j = 0; j < numberOfPrints; j++)
+            {
+                tokenList.add(new Token(dentType, lineNumber));
+            }
+            currentIndentLevel = newIndentLevel;
+        }
+        indentsHandled = true;
+    }
+
+    /**
+     * Checks if any map contains the incoming value String.
+     *
+     * @param currentValue Incoming value string.
+     * @return True if any maps contain currentValue.
+     */
+    private boolean anyMapContains(String currentValue)
+    {
+        return keywordMap.containsKey(currentValue) || punctuationMap.containsKey(currentValue);
+    }
+
+    /**
+     * Returns the appropriate tokenType for the incoming String from some map.
+     *
+     * @param currentValue Incoming String.
+     * @return Appropriate tokenType.
+     */
+    private tokenType getFromSomeMap(String currentValue)
+    {
+        return keywordMap.get(currentValue) == null ? punctuationMap.get(currentValue) : keywordMap.get(currentValue);
+    }
+
+    /**
+     * Loads all tokenTypes into memory.
+     */
+    private void initializeMaps()
+    {
+        initializeKeywordMap();
+        initializePunctuationMap();
+    }
+
+    /**
      * Maps each Kakuzaki keyword to a tokenType as written in tokenType.java.
      */
     private void initializeKeywordMap()
@@ -218,6 +306,34 @@ public class Lexer
         keywordMap.put("array", tokenType.ARRAY);
 
         keywordMap.put("var", tokenType.VAR);
-        keywordMap.put("mod", tokenType.MOD);
+    }
+
+    /**
+     * Maps each Kakuzaki punctuation to a tokenType as written in tokenType.java.
+     */
+    private void initializePunctuationMap()
+    {
+        punctuationMap.put("+", tokenType.ADD);
+        punctuationMap.put("-", tokenType.MINUS);
+        punctuationMap.put("*", tokenType.MULT);
+        punctuationMap.put("/", tokenType.DIV);
+        punctuationMap.put("mod", tokenType.MOD);
+
+        punctuationMap.put(">", tokenType.GTHAN);
+        punctuationMap.put("<", tokenType.LTHAN);
+        punctuationMap.put(">=", tokenType.GETO);
+        punctuationMap.put("<=", tokenType.LETO);
+        punctuationMap.put("=", tokenType.EQUAL);
+        punctuationMap.put("<>", tokenType.NEQUAL);
+        punctuationMap.put("not", tokenType.NOT);
+        punctuationMap.put("and", tokenType.AND);
+        punctuationMap.put("or", tokenType.OR);
+
+        punctuationMap.put(":=", tokenType.ASSIGN);
+        punctuationMap.put(":", tokenType.COLON);
+        punctuationMap.put(";", tokenType.SEMICOLON);
+        punctuationMap.put(",", tokenType.COMMA);
+        punctuationMap.put("(", tokenType.LPAREN);
+        punctuationMap.put(")", tokenType.RPAREN);
     }
 }

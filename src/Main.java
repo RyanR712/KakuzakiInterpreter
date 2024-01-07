@@ -61,12 +61,19 @@ public class Main
      */
     private static void printTokens(ArrayList<Token> tokenList)
     {
+        boolean isLineNumberPrinted = false;
         for (int i = 0; i < tokenList.size(); i++)
         {
+            if (!isLineNumberPrinted)
+            {
+                System.out.print(tokenList.get(i).getLineNumber() + "\t");
+                isLineNumberPrinted = true;
+            }
             System.out.print(tokenList.get(i) + " ");
             if (tokenList.get(i).getType() == tokenType.EOL)
             {
                 System.out.println();
+                isLineNumberPrinted = false;
             }
         }
     }

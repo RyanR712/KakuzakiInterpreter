@@ -11,12 +11,16 @@ public class Token
 
     private String value;
 
+    private final int lineNumber;
+
     /**
      * Constructs a Token with type EOL and value "ENDOFLINE".
      */
-    public Token()
+    public Token(int incomingLine)
     {
         type = tokenType.EOL;
+
+        lineNumber = incomingLine;
     }
 
     /**
@@ -24,9 +28,11 @@ public class Token
      *
      * @param incomingType Incoming tokenType.
      */
-    public Token(tokenType incomingType)
+    public Token(tokenType incomingType, int incomingLine)
     {
         type = incomingType;
+
+        lineNumber = incomingLine;
     }
 
     /**
@@ -35,10 +41,12 @@ public class Token
      * @param incomingType Incoming tokenType.
      * @param incomingValue Incoming value string.
      */
-    public Token(tokenType incomingType, String incomingValue)
+    public Token(tokenType incomingType, String incomingValue, int incomingLine)
     {
         type = incomingType;
         value = incomingValue;
+
+        lineNumber = incomingLine;
     }
 
     /**
@@ -81,12 +89,18 @@ public class Token
         value += newCharacter;
     }
 
+    public int getLineNumber()
+    {
+        return lineNumber;
+    }
+
     /**
      * Creates and returns this Token in the format {tokenType}({value String}).
      * If the value String is null, then only the tokenType is printed.
      *
      * @return This Token in the above format.
      */
+    @Override
     public String toString()
     {
         return value == null ? type + "" : type + "(" + value + ")";

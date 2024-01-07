@@ -1,16 +1,5 @@
-define hello
-    1 + 1
-    1 / 4
-    3 mod 3
-    1 * 99
-    44 - 4
-    1 and 3
-    2.6704218 or 8124076.2
-    3 not 1
-    2 < 3
-    8 > 7
-
-define goodbye
-    variables goodbyeMessage : string
-            write string
-shouldFollowThreeDedents
+1 <= 1
+1 <> 1
+1 >= 1
+    1 := 1 <> 2 <= 3 >= 4 < 5 > 6 = 1
+1 = 1

@@ -65,9 +65,13 @@ public class Lexer
                     {
                         j = handleToken(currentLine, j, tokenType.NUMBER);
                     }
-                    else if (Character.isLetter(currentChar) || punctuationMap.containsKey("" + currentChar))
+                    else if (Character.isLetter(currentChar))
                     {
                         j = handleToken(currentLine, j, tokenType.WORD);
+                    }
+                    else if (punctuationMap.containsKey("" + currentChar))
+                    {
+                        j += handlePunctuation(currentLine, j, currentLine.charAt(j));
                     }
                     else if (currentChar == '{')
                     {
@@ -152,6 +156,108 @@ public class Lexer
     }
 
     /**
+     * Creates both multi character and single character punctuation Tokens from the incoming line string,
+     * starting at the incoming index and with the incoming character.
+     * <p></p>
+     * Also determines the number of characters the created Token takes up.
+     *
+     * @param currentLine Incoming line String.
+     * @param currentIndex Incoming index.
+     * @param currentChar Incoming character.
+     * @return Number of characters the created Token takes up.
+     */
+    private int handlePunctuation(String currentLine, int currentIndex, char currentChar)
+    {
+        if (currentChar == ':' || currentChar == '<' || currentChar == '>')
+        {
+            handleMultiCharacterPunctuation(currentLine, currentIndex, currentChar);
+            return 1;
+        }
+        else
+        {
+            tokenList.add(new Token(punctuationMap.get("" + currentChar), lineNumber));
+            return 0;
+        }
+    }
+
+    /**
+     * Creates multi character punctuation Tokens from the incoming line String, starting at the incoming index
+     * and with the incoming character.
+     *
+     * @param currentLine Incoming line String.
+     * @param currentIndex Incoming index.
+     * @param currentChar Incoming character.
+     */
+    private void handleMultiCharacterPunctuation(String currentLine, int currentIndex, char currentChar)
+    {
+        char nextChar = ' ';
+        if (currentChar == ':')
+        {
+            try
+            {
+                nextChar = peekAhead(currentLine, currentIndex + 1);
+            }
+            catch (Exception e)
+            {
+                System.out.println(e.getMessage());
+            }
+            boolean b = nextChar == '=' ? tokenList.add(new Token(punctuationMap.get(currentChar + "="), lineNumber)) :
+                                          tokenList.add(new Token(punctuationMap.get(currentChar + ""), lineNumber));
+        }
+        else if (currentChar == '<')
+        {
+            try
+            {
+                nextChar = peekAhead(currentLine, currentIndex + 1);
+            }
+            catch (Exception e)
+            {
+                System.out.println(e.getMessage());
+            }
+            boolean isLoneLessThanCharacter = nextChar != '=' && nextChar != '>';
+            if (isLoneLessThanCharacter)
+            {
+                tokenList.add(new Token(punctuationMap.get(currentChar + ""), lineNumber));
+            }
+            else
+            {
+                boolean b = nextChar == '=' ? tokenList.add(new Token(punctuationMap.get(currentChar + "="), lineNumber)) :
+                                              tokenList.add(new Token(punctuationMap.get(currentChar + ">"), lineNumber));
+            }
+        }
+        else if (currentChar == '>')
+        {
+            try
+            {
+                nextChar = peekAhead(currentLine, currentIndex + 1);
+            }
+            catch (Exception e)
+            {
+                System.out.println(e.getMessage());
+            }
+            boolean b = nextChar == '=' ? tokenList.add(new Token(punctuationMap.get(currentChar + "="), lineNumber)) :
+                                          tokenList.add(new Token(punctuationMap.get(currentChar + ""), lineNumber));
+        }
+    }
+
+    /**
+     * Gets and returns the character in the incoming line String that is ahead by the incoming int.
+     *
+     * @param currentLine Incoming line String.
+     * @param nextIndex Incoming int.
+     * @return Character in currentLine that is nextIndex characters ahead.
+     * @throws Exception If nextIndex is greater than currentLine's length.
+     */
+    private char peekAhead(String currentLine, int nextIndex) throws Exception
+    {
+        if (nextIndex > currentLine.length())
+        {
+            throw new Exception("Peeked too far ahead.");
+        }
+        return currentLine.charAt(nextIndex);
+    }
+
+    /**
      * Checks and returns if the incoming character is a decimal point.
      * If a token of tokenType number is written with one decimal point inside, then it must be a real number.
      *
@@ -185,6 +291,7 @@ public class Lexer
 
         else return Character.isDigit(currentChar);
     }
+
 
     /**
      * Traverses all whitespace characters in the incoming string starting at the incoming index onward.

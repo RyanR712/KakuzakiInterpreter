@@ -6,8 +6,8 @@ package LexerTools;
 
 public class SyntaxErrorException extends Exception
 {
-    public SyntaxErrorException(char unexpectedCharacter)
+    public SyntaxErrorException(String message)
     {
-        super("Unexpected character " + unexpectedCharacter + " found in lexing.");
+        super(message);
     }
 }

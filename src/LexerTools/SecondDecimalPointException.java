@@ -4,7 +4,7 @@
 
 package LexerTools;
 
-public class SecondDecimalPointException extends Exception
+public class SecondDecimalPointException extends SyntaxErrorException
 {
     public SecondDecimalPointException()
     {

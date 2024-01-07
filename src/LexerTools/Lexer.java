@@ -37,7 +37,7 @@ public class Lexer
      * @param incomingLines Incoming lines.
      * @throws SecondDecimalPointException If a second decimal point is detected in a real number.
      */
-    public void lex(ArrayList<String> incomingLines) throws SecondDecimalPointException
+    public void lex(ArrayList<String> incomingLines) throws Exception
     {
         String currentLine;
         char currentChar;
@@ -72,6 +72,14 @@ public class Lexer
                     else if (punctuationMap.containsKey("" + currentChar))
                     {
                         j += handlePunctuation(currentLine, j, currentLine.charAt(j));
+                    }
+                    else if (currentChar == '\"')
+                    {
+                        j = handleStringLiteral(currentLine, j);
+                    }
+                    else if (currentChar == '\'')
+                    {
+                        j += handleCharacterLiteral(currentLine, j);
                     }
                     else if (currentChar == '{')
                     {
@@ -140,19 +148,6 @@ public class Lexer
             tokenList.add(new Token(currentTokenType, currentValue, lineNumber));
         }
         return returnIndex;
-    }
-
-    /**
-     * Adds an EOL Token to the Token ArrayList.
-     */
-    private void handleEOL()
-    {
-        if (!isComment)
-        {
-            tokenList.add(new Token(lineNumber));
-        }
-        lineNumber++;
-        indentsHandled = false;
     }
 
     /**
@@ -241,6 +236,76 @@ public class Lexer
     }
 
     /**
+     * Creates a Token of type STRINGLITERAL starting in the incoming line String at the incoming index.
+     * Determines and returns how large the STRINGLITERAL Token is.
+     *
+     * @param currentLine Incoming line String.
+     * @param currentIndex Incoming index.
+     * @return How large the STRINGLITERAL Token is.
+     * @throws SyntaxErrorException If the string literal was not closed.
+     */
+    private int handleStringLiteral(String currentLine, int currentIndex) throws SyntaxErrorException
+    {
+        char currentChar = ' ';
+        String literalValue = "";
+        for (int i = currentIndex + 1; i < currentLine.length() && currentChar != '\"'; i++)
+        {
+            currentChar = currentLine.charAt(i);
+            if (currentChar != '\"')
+            {
+                literalValue += currentChar;
+            }
+            currentIndex = i;
+        }
+        if (currentLine.charAt(currentIndex) != '\"')
+        {
+            throw new SyntaxErrorException("Unclosed string literal on line " + lineNumber + ".");
+        }
+        tokenList.add(new Token(tokenType.STRINGLITERAL, literalValue, lineNumber));
+        return currentIndex;
+    }
+
+
+    /**
+     * Creates a Token of type CHARLITERAL starting in the incoming line String at the incoming index.
+     * Determines and returns how large the CHARLITERAL Token is.
+     * As of 1/7/2024, the maximum length for a CHARLITERAL is 3, both single quotes included.
+     * If and when escape characters are built in, this must change.
+     *
+     * @param currentLine Incoming line String.
+     * @param currentIndex Incoming index.
+     * @return How large the CHARLITERAL Token is.
+     * @throws Exception If the character literal was not closed.
+     */
+    private int handleCharacterLiteral(String currentLine, int currentIndex) throws Exception
+    {
+        final int TOTAL_CHARACTER_LITERAL_LENGTH = 3;
+        char currentChar = currentLine.charAt(currentIndex + 1);
+        if (peekAhead(currentLine, currentIndex + TOTAL_CHARACTER_LITERAL_LENGTH - 1) != '\'')
+        {
+            throw new SyntaxErrorException("Unenclosed or too large character literal on line " + lineNumber + ".");
+        }
+        else
+        {
+            tokenList.add(new Token(tokenType.CHARLITERAL, currentChar + "", lineNumber));
+            return TOTAL_CHARACTER_LITERAL_LENGTH;
+        }
+    }
+
+    /**
+     * Adds an EOL Token to the Token ArrayList.
+     */
+    private void handleEOL()
+    {
+        if (!isComment)
+        {
+            tokenList.add(new Token(lineNumber));
+        }
+        lineNumber++;
+        indentsHandled = false;
+    }
+
+    /**
      * Gets and returns the character in the incoming line String that is ahead by the incoming int.
      *
      * @param currentLine Incoming line String.
@@ -291,7 +356,6 @@ public class Lexer
 
         else return Character.isDigit(currentChar);
     }
-
 
     /**
      * Traverses all whitespace characters in the incoming string starting at the incoming index onward.

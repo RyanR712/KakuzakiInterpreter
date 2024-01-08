@@ -2,7 +2,7 @@
  * Thrown when there are bizarre characters found in Lexer.
  */
 
-package LexerTools;
+package Exceptions;
 
 public class SyntaxErrorException extends Exception
 {

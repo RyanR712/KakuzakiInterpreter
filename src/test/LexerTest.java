@@ -4,7 +4,7 @@
 
 package test;
 
-import LexerTools.tokenType;
+import CrossStageTools.tokenType;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 
 import LexerTools.Lexer;
-import LexerTools.Token;
+import CrossStageTools.Token;
 
 public class LexerTest
 {

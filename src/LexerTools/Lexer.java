@@ -4,6 +4,11 @@
 
 package LexerTools;
 
+import CrossStageTools.Token;
+import CrossStageTools.tokenType;
+import Exceptions.SecondDecimalPointException;
+import Exceptions.SyntaxErrorException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 

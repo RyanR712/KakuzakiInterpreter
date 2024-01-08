@@ -38,7 +38,7 @@ public class Lexer
      * Iterates over all the incoming lines and populates the Token ArrayList with the Tokens created from them.
      *
      * @param incomingLines Incoming lines.
-     * @throws SecondDecimalPointException If a second decimal point is detected in a real number.
+     * @throws Exception If syntax errors are detected.
      */
     public void lex(ArrayList<String> incomingLines) throws Exception
     {
@@ -106,6 +106,19 @@ public class Lexer
     public ArrayList<Token> getTokenList()
     {
         return tokenList;
+    }
+
+    /**
+     * Runs the lexing of the incoming line Strings and returns the created Token list in the same method.
+     *
+     * @param incomingLines Incoming line Strings.
+     * @return Created Token list.
+     * @throws Exception If syntax errors are detected.
+     */
+    public ArrayList<Token> lexAndReturnTokenList(ArrayList<String> incomingLines) throws Exception
+    {
+        lex(incomingLines);
+        return getTokenList();
     }
 
     /**

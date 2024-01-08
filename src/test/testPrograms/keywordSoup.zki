@@ -1,1 +1,3 @@
-define boolean not or and
+define constants variables if elsif else then
+while repeat until for from to
+integer real boolean character string array var

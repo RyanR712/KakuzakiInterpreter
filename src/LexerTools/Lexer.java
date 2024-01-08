@@ -18,6 +18,9 @@ public class Lexer
     private boolean isComment;
     private boolean indentsHandled;
 
+    /**
+     * Instantiates the Lexer with an empty Token list, empty maps and a line number.
+     */
     public Lexer()
     {
         tokenList = new ArrayList<>();
@@ -67,9 +70,9 @@ public class Lexer
                     }
                     else if (Character.isLetter(currentChar))
                     {
-                        j = handleToken(currentLine, j, tokenType.WORD);
+                        j = handleToken(currentLine, j, tokenType.IDENTIFIER);
                     }
-                    else if (punctuationMap.containsKey("" + currentChar))
+                    else if (isPunctuation(currentChar))
                     {
                         j += handlePunctuation(currentLine, j, currentLine.charAt(j));
                     }
@@ -79,7 +82,7 @@ public class Lexer
                     }
                     else if (currentChar == '\'')
                     {
-                        j += handleCharacterLiteral(currentLine, j);
+                        j = handleCharacterLiteral(currentLine, j);
                     }
                     else if (currentChar == '{')
                     {
@@ -93,6 +96,7 @@ public class Lexer
             }
             handleEOL();
         }
+        handleTrailingDedents();
     }
 
     /**
@@ -132,7 +136,7 @@ public class Lexer
             {
                 break;
             }
-            else if (currentTokenType == tokenType.WORD && !Character.isLetterOrDigit(currentChar))
+            else if (currentTokenType == tokenType.IDENTIFIER && !Character.isLetterOrDigit(currentChar))
             {
                 break;
             }
@@ -186,53 +190,48 @@ public class Lexer
     private void handleMultiCharacterPunctuation(String currentLine, int currentIndex, char currentChar)
     {
         char nextChar = ' ';
-        if (currentChar == ':')
+        try
         {
-            try
-            {
-                nextChar = peekAhead(currentLine, currentIndex + 1);
-            }
-            catch (Exception e)
-            {
-                System.out.println(e.getMessage());
-            }
-            boolean b = nextChar == '=' ? tokenList.add(new Token(punctuationMap.get(currentChar + "="), lineNumber)) :
-                                          tokenList.add(new Token(punctuationMap.get(currentChar + ""), lineNumber));
+            nextChar = peekAhead(currentLine, currentIndex + 1);
         }
-        else if (currentChar == '<')
+        catch (Exception ignored)
+        {}
+
+        if (currentChar == ':' || currentChar == '>' || currentChar == '<')
         {
-            try
-            {
-                nextChar = peekAhead(currentLine, currentIndex + 1);
-            }
-            catch (Exception e)
-            {
-                System.out.println(e.getMessage());
-            }
-            boolean isLoneLessThanCharacter = nextChar != '=' && nextChar != '>';
+            boolean isLoneLessThanCharacter = currentChar == '<' && !(nextChar == '=' || nextChar == '>');
             if (isLoneLessThanCharacter)
             {
-                tokenList.add(new Token(punctuationMap.get(currentChar + ""), lineNumber));
+                addPunctuationToken(currentChar);
             }
             else
             {
-                boolean b = nextChar == '=' ? tokenList.add(new Token(punctuationMap.get(currentChar + "="), lineNumber)) :
-                                              tokenList.add(new Token(punctuationMap.get(currentChar + ">"), lineNumber));
+                addPunctuationToken(currentChar, nextChar);
             }
         }
-        else if (currentChar == '>')
-        {
-            try
-            {
-                nextChar = peekAhead(currentLine, currentIndex + 1);
-            }
-            catch (Exception e)
-            {
-                System.out.println(e.getMessage());
-            }
-            boolean b = nextChar == '=' ? tokenList.add(new Token(punctuationMap.get(currentChar + "="), lineNumber)) :
-                                          tokenList.add(new Token(punctuationMap.get(currentChar + ""), lineNumber));
-        }
+    }
+
+    /**
+     * Adds a punctuation Token with the incoming character followed by the space character.
+     * Since the String inside the other addPunctuationToken method is trimmed,
+     * this is like adding an empty character.
+     *
+     * @param currentChar Incoming character.
+     */
+    private void addPunctuationToken(char currentChar)
+    {
+        addPunctuationToken(currentChar, ' ');
+    }
+
+    /**
+     * Adds a punctuation Token with the first incoming character followed by the next incoming character.
+     *
+     * @param currentChar First incoming character.
+     * @param nextChar Next incoming character.
+     */
+    private void addPunctuationToken(char currentChar, char nextChar)
+    {
+        tokenList.add(new Token(punctuationMap.get((currentChar + "" + nextChar).trim()), lineNumber));
     }
 
     /**
@@ -265,7 +264,6 @@ public class Lexer
         return currentIndex;
     }
 
-
     /**
      * Creates a Token of type CHARLITERAL starting in the incoming line String at the incoming index.
      * Determines and returns how large the CHARLITERAL Token is.
@@ -288,7 +286,7 @@ public class Lexer
         else
         {
             tokenList.add(new Token(tokenType.CHARLITERAL, currentChar + "", lineNumber));
-            return TOTAL_CHARACTER_LITERAL_LENGTH;
+            return currentIndex + TOTAL_CHARACTER_LITERAL_LENGTH;
         }
     }
 
@@ -358,6 +356,17 @@ public class Lexer
     }
 
     /**
+     * Checks and returns if the incoming character is contained in the punctuation HashMap.
+     *
+     * @param currentChar Incoming character.
+     * @return True if currentChar is contained in the punctuation HashMap.
+     */
+    private boolean isPunctuation(char currentChar)
+    {
+        return punctuationMap.containsKey(currentChar + "");
+    }
+
+    /**
      * Traverses all whitespace characters in the incoming string starting at the incoming index onward.
      * @param currentLine Incoming string.
      * @param currentIndex Incoming index.
@@ -415,6 +424,18 @@ public class Lexer
             currentIndentLevel = newIndentLevel;
         }
         indentsHandled = true;
+    }
+
+    /**
+     * Adds trailing dedents to the end of a program according to how many indents are left at the final line.
+     */
+    private void handleTrailingDedents()
+    {
+        while (currentIndentLevel > 0)
+        {
+            tokenList.add(new Token(tokenType.DEDENT, lineNumber));
+            currentIndentLevel--;
+        }
     }
 
     /**

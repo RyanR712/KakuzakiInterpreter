@@ -14,25 +14,28 @@ public class Token
     private final int lineNumber;
 
     /**
-     * Constructs a Token with type EOL and value "ENDOFLINE".
+     * Constructs a Token with tokenType EOL and the incoming line number.
+     *
+     * @param incomingLineNumber Incoming line number.
      */
-    public Token(int incomingLine)
+    public Token(int incomingLineNumber)
     {
         type = tokenType.EOL;
 
-        lineNumber = incomingLine;
+        lineNumber = incomingLineNumber;
     }
 
     /**
-     * Constructs a Token with the incoming tokenType and no value String.
+     * Constructs a Token with the incoming tokenType, no value String and the incoming line number.
      *
      * @param incomingType Incoming tokenType.
+     * @param incomingLineNumber Incoming line number.
      */
-    public Token(tokenType incomingType, int incomingLine)
+    public Token(tokenType incomingType, int incomingLineNumber)
     {
         type = incomingType;
 
-        lineNumber = incomingLine;
+        lineNumber = incomingLineNumber;
     }
 
     /**
@@ -40,13 +43,14 @@ public class Token
      *
      * @param incomingType Incoming tokenType.
      * @param incomingValue Incoming value string.
+     * @param incomingLineNumber Incoming line number.
      */
-    public Token(tokenType incomingType, String incomingValue, int incomingLine)
+    public Token(tokenType incomingType, String incomingValue, int incomingLineNumber)
     {
         type = incomingType;
         value = incomingValue;
 
-        lineNumber = incomingLine;
+        lineNumber = incomingLineNumber;
     }
 
     /**
@@ -89,6 +93,10 @@ public class Token
         value += newCharacter;
     }
 
+    /**
+     * Returns the line number of this Token.
+     * @return Line number of this Token.
+     */
     public int getLineNumber()
     {
         return lineNumber;

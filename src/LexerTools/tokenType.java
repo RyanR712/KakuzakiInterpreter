@@ -6,7 +6,7 @@ package LexerTools;
 
 public enum tokenType
 {
-    WORD, NUMBER, EOL,
+    IDENTIFIER, NUMBER, EOL,
     INDENT, DEDENT,
     DEFINE, CONSTANTS, VARIABLES,
     IF, ELSIF, ELSE, THEN,

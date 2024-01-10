@@ -8,9 +8,12 @@ public class IntegerNode extends DataTypeNode
 {
     private int data;
 
-    public IntegerNode(int incomingData)
+    private int lineNumber;
+
+    public IntegerNode(int incomingData, int line)
     {
         data = incomingData;
+        lineNumber = line;
     }
 
     /**
@@ -26,6 +29,12 @@ public class IntegerNode extends DataTypeNode
     @Override
     public String toString()
     {
-        return null;
+        return data + "";
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 }

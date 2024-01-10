@@ -9,8 +9,12 @@ import CrossStageTools.tokenType;
 import Exceptions.SecondDecimalPointException;
 import Exceptions.SyntaxErrorException;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.HashMap;
+import java.time.ZonedDateTime;
 
 public class Lexer
 {
@@ -122,8 +126,62 @@ public class Lexer
      */
     public ArrayList<Token> lexAndReturnTokenList(ArrayList<String> incomingLines) throws Exception
     {
-        lex(incomingLines);
         return getTokenList();
+    }
+
+    /**
+     * Writes a formatted String of this Lexer's Tokens to a .txt File in /LexerDumps.
+     *
+     * @throws IOException If a File cannot be created.
+     */
+    public void writeDebugOutput(ArrayList<Token> localTokenList) throws IOException
+    {
+        ZonedDateTime zdt = ZonedDateTime.now();
+        String formattedOutput = zdt.getDayOfMonth() + "-" + zdt.getMonthValue() + "-" + zdt.getYear() + "@" +
+                                zdt.getHour() + "_" + zdt.getMinute() + "_" + zdt.getSecond();
+        File file = new File("./src/Debug/LexerDumps", "lexer_" + formattedOutput + ".txt");
+        if (file.createNewFile())
+        {
+            FileWriter fw = new FileWriter(file);
+
+            fw.write(formatTokens(localTokenList));
+
+            fw.close();
+        }
+    }
+
+    public void writeDebugOutput() throws IOException
+    {
+        writeDebugOutput(tokenList);
+    }
+
+    /**
+     * Formats this Lexer's token list in a sensible format.
+     */
+    private String formatTokens()
+    {
+        return formatTokens(tokenList);
+    }
+
+    private String formatTokens(ArrayList<Token> localTokenList)
+    {
+        String dumpString = "";
+        boolean isLineNumberPrinted = false;
+        for (int i = 0; i < localTokenList.size(); i++)
+        {
+            if (!isLineNumberPrinted)
+            {
+                dumpString += localTokenList.get(i).getLineNumber() + "\t";
+                isLineNumberPrinted = true;
+            }
+            dumpString += localTokenList.get(i) + " ";
+            if (localTokenList.get(i).getType() == tokenType.EOL)
+            {
+                dumpString += "\n";
+                isLineNumberPrinted = false;
+            }
+        }
+        return dumpString;
     }
 
     /**

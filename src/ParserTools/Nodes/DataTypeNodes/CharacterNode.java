@@ -8,9 +8,12 @@ public class CharacterNode extends DataTypeNode
 {
     private char data;
 
-    public CharacterNode(char incomingData)
+    private int lineNumber;
+
+    public CharacterNode(char incomingData, int line)
     {
         data = incomingData;
+        lineNumber = line;
     }
 
     public char getData()
@@ -21,6 +24,12 @@ public class CharacterNode extends DataTypeNode
     @Override
     public String toString()
     {
-        return null;
+        return data + "";
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 }

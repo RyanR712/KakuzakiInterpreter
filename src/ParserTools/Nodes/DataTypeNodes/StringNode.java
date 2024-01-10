@@ -8,9 +8,12 @@ public class StringNode extends DataTypeNode
 {
     private String data;
 
-    public StringNode(String incomingData)
+    private int lineNumber;
+
+    public StringNode(String incomingData, int line)
     {
         data = incomingData;
+        lineNumber = line;
     }
 
     /**
@@ -26,6 +29,12 @@ public class StringNode extends DataTypeNode
     @Override
     public String toString()
     {
-        return null;
+        return data;
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 }

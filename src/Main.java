@@ -14,19 +14,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 
-import LexerTools.Lexer;
 import CrossStageTools.Token;
-import CrossStageTools.tokenType;
+import LexerTools.Lexer;
+import ParserTools.Parser;
 
 public class Main
 {
     /**
      * Runs each of the stages of the interpreter, in this order:
      * Lexing, Parsing, Semantic Analysis, Interpreting
+     *
      * @param args File name sent to Main.java.
      * @throws IOException If no file ending in ".zki" is found.
+     * @throws Exception If one of the above stages fails.
      */
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args) throws Exception
     {
         if (args.length != 1 || !args[0].contains(".zki"))
         {
@@ -35,6 +37,7 @@ public class Main
         }
         else
         {
+            ArrayList<Token> tokenList = new ArrayList<Token>();
             Path path = Paths.get(args[0]);
             ArrayList<String> lines = (ArrayList<String>)(Files.readAllLines(path, StandardCharsets.UTF_8));
 
@@ -43,38 +46,32 @@ public class Main
             try
             {
                 lexer.lex(lines);
+                tokenList = lexer.getTokenList();
             }
             catch (Exception e)
             {
-                System.out.println("The following error was found while lexing your program: " + e.getMessage());
+                System.out.println("The following error was found while lexing your program: " + e.getMessage() +
+                        " Lexer's working output written to /src/Debug/LexerDumps.txt.");
+                lexer.writeDebugOutput();
+                throw new Exception("Lexing failed.");
             }
 
-            printTokens(lexer.getTokenList());
-        }
-    }
+            Parser parser = new Parser(lexer.getTokenList());
 
-    /**
-     * Prints the incoming token list to console in a sensible format.
-     * <p></p>
-     * Since this method will not be useful past the lexing stage, it will be marked deprecated then.
-     * @param tokenList Incoming token list.
-     */
-    private static void printTokens(ArrayList<Token> tokenList)
-    {
-        boolean isLineNumberPrinted = false;
-        for (int i = 0; i < tokenList.size(); i++)
-        {
-            if (!isLineNumberPrinted)
+            try
             {
-                System.out.print(tokenList.get(i).getLineNumber() + "\t");
-                isLineNumberPrinted = true;
+                parser.parse();
             }
-            System.out.print(tokenList.get(i) + " ");
-            if (tokenList.get(i).getType() == tokenType.EOL)
+            catch (Exception e)
             {
-                System.out.println();
-                isLineNumberPrinted = false;
+                System.out.println("The following error was found while parsing your program: " + e.getMessage() +
+                        " Parser's output written to /src/Debug/ParserDumps.txt.");
+                lexer.writeDebugOutput(tokenList);
+                parser.writeDebugOutput();
+                throw new Exception("Parsing failed.");
             }
+
+            System.out.println(parser.getNodeList());
         }
     }
 }

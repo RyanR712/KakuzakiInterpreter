@@ -8,9 +8,12 @@ public class BooleanNode extends DataTypeNode
 {
     private boolean data;
 
-    public BooleanNode(boolean incomingData)
+    private int lineNumber;
+
+    public BooleanNode(boolean incomingData, int line)
     {
         data = incomingData;
+        lineNumber = line;
     }
 
     /**
@@ -26,6 +29,12 @@ public class BooleanNode extends DataTypeNode
     @Override
     public String toString()
     {
-        return null;
+        return data + "";
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 }

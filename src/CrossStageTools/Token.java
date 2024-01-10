@@ -103,6 +103,16 @@ public class Token
     }
 
     /**
+     * Checks and returns if this Token describes a real number.
+     *
+     * @return True if this Token describes a real number.
+     */
+    public boolean isRealNumber()
+    {
+        return type == tokenType.NUMBER && value.contains(".");
+    }
+
+    /**
      * Creates and returns this Token in the format {tokenType}({value String}).
      * If the value String is null, then only the tokenType is printed.
      *

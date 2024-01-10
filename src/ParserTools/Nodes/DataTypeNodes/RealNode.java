@@ -8,9 +8,12 @@ public class RealNode extends DataTypeNode
 {
     private float data;
 
-    public RealNode(float incomingData)
+    private int lineNumber;
+
+    public RealNode(float incomingData, int line)
     {
         data = incomingData;
+        lineNumber = line;
     }
 
     /**
@@ -26,6 +29,12 @@ public class RealNode extends DataTypeNode
     @Override
     public String toString()
     {
-        return null;
+        return data + "";
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 }

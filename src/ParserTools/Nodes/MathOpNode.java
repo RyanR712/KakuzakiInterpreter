@@ -11,11 +11,15 @@ public class MathOpNode extends ASTNode
     private ASTNode leftOperand, rightOperand;
     private operationType opType;
 
-    public MathOpNode(ASTNode incomingLeftOperand, ASTNode incomingRightOperand, operationType incomingOpType)
+    private int lineNumber;
+
+    public MathOpNode(ASTNode incomingLeftOperand, operationType incomingOpType, ASTNode incomingRightOperand,
+                      int line)
     {
         leftOperand = incomingLeftOperand;
-        rightOperand = incomingRightOperand;
         opType = incomingOpType;
+        rightOperand = incomingRightOperand;
+        lineNumber = line;
     }
 
     /**
@@ -70,6 +74,12 @@ public class MathOpNode extends ASTNode
     @Override
     public String toString()
     {
-        return leftOperand + "(" + opTypeToString(opType) + ")" + rightOperand;
+        return leftOperand + " " + opTypeToString(opType) + " " + rightOperand;
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 }

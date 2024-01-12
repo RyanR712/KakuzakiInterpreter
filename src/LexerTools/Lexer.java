@@ -83,7 +83,7 @@ public class Lexer
                     }
                     else if (isPunctuation(currentChar))
                     {
-                        j += handlePunctuation(currentLine, j, currentLine.charAt(j));
+                        j = handlePunctuation(currentLine, j, currentLine.charAt(j));
                     }
                     else if (currentChar == '\"')
                     {
@@ -150,6 +150,11 @@ public class Lexer
         }
     }
 
+    /**
+     * Writes this Lexer's Token list to a dump file.
+     *
+     * @throws IOException If there is an issue with writing to a file.
+     */
     public void writeDebugOutput() throws IOException
     {
         writeDebugOutput(tokenList);
@@ -227,7 +232,7 @@ public class Lexer
         {
             tokenList.add(new Token(currentTokenType, currentValue, lineNumber));
         }
-        return returnIndex;
+        return returnIndex - 1;
     }
 
     /**
@@ -246,12 +251,12 @@ public class Lexer
         if (currentChar == ':' || currentChar == '<' || currentChar == '>')
         {
             handleMultiCharacterPunctuation(currentLine, currentIndex, currentChar);
-            return 1;
+            return 1 + currentIndex;
         }
         else
         {
             tokenList.add(new Token(punctuationMap.get("" + currentChar), lineNumber));
-            return 0;
+            return currentIndex;
         }
     }
 
@@ -586,6 +591,7 @@ public class Lexer
         punctuationMap.put("*", tokenType.MULT);
         punctuationMap.put("/", tokenType.DIV);
         punctuationMap.put("mod", tokenType.MOD);
+        punctuationMap.put("~", tokenType.NEGATE);
 
         punctuationMap.put(">", tokenType.GTHAN);
         punctuationMap.put("<", tokenType.LTHAN);

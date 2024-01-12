@@ -74,7 +74,7 @@ public class MathOpNode extends ASTNode
     @Override
     public String toString()
     {
-        return leftOperand + " " + opTypeToString(opType) + " " + rightOperand;
+        return "(" + leftOperand + " " + opTypeToString(opType) + " " + rightOperand + ")";
     }
 
     @Override

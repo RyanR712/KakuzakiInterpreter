@@ -34,6 +34,11 @@ public class Parser
         lineNumber = 1;
     }
 
+    /**
+     * Produces and adds ASTNodes to this Parser's ASTNode list so long as there are ASTNodes to add.
+     *
+     * @throws SyntaxErrorException If any methods in the call stack throw Exceptions.
+     */
     public void parse() throws SyntaxErrorException
     {
         ASTNode nodeToAdd;
@@ -75,6 +80,11 @@ public class Parser
         }
     }
 
+    /**
+     * Formats and returns this Parser's ASTNodes in a sensible manner.
+     *
+     * @return Formatted ASTNodes in one String.
+     */
     private String formatNodes()
     {
         String dumpString = "";
@@ -96,7 +106,13 @@ public class Parser
         return dumpString;
     }
 
-    private ASTNode expression()
+    /**
+     * Removes and returns an expression ASTNode.
+     * An expression is a number or a MathOpNode with addition or subtraction as its operation type.
+     *
+     * @return Expression ASTNode.
+     */
+    private ASTNode expression() throws SyntaxErrorException
     {
         ASTNode leftOperand = term();
 
@@ -122,6 +138,12 @@ public class Parser
         }
     }
 
+    /**
+     * Removes and returns an operationType on the expression priority.
+     * The expression priority operators include addition and subtraction.
+     *
+     * @return operationType on the expression priority or null if no such operator is found.
+     */
     private operationType handleExpressionOperator()
     {
         if (matchAndRemove(tokenType.ADD) != null)
@@ -138,7 +160,13 @@ public class Parser
         }
     }
 
-    private ASTNode term()
+    /**
+     * Removes and returns a term ASTNode.
+     * A term is a number or a MathOpNode with multiplication, division or modularity as its operation type.
+     *
+     * @return Term ASTNode.
+     */
+    private ASTNode term() throws SyntaxErrorException
     {
         ASTNode leftOperand = factor();
         operationType opType = handleTermOperator();
@@ -152,10 +180,21 @@ public class Parser
         {
             return leftOperand;
         }
+        else if (peek(0).getType() == tokenType.MULT || peek(0).getType() == tokenType.DIV || peek(0).getType() == tokenType.MOD)
+        {
+            //fix this style when you are less tired please
+            return new MathOpNode(new MathOpNode(leftOperand, opType, rightOperand, lineNumber), handleTermOperator(), term(), lineNumber);
+        }
 
         return new MathOpNode(leftOperand, opType, rightOperand, lineNumber);
     }
 
+    /**
+     * Removes and returns an operationType on the term priority.
+     * The term priority operators include multiplication, division and modularity.
+     *
+     * @return operationType on the term priority or null if no such operator is found.
+     */
     private operationType handleTermOperator()
     {
         if (matchAndRemove(tokenType.MULT) != null)
@@ -176,22 +215,37 @@ public class Parser
         }
     }
 
-    private ASTNode factor()
+    /**
+     * Removes and returns a factor ASTNode.
+     * A factor is a number or a parenthesized expression.
+     *
+     * @return Factor ASTNode.
+     */
+    private ASTNode factor() throws SyntaxErrorException
     {
         if (matchAndRemove(tokenType.LPAREN) != null)
         {
             ASTNode parenthesizedExpressionNode = expression();
-            matchAndRemove(tokenType.RPAREN); //may fail. put an exception here when you are less tired
-            return parenthesizedExpressionNode;
-        }
-        else if (peek(0).getType() == tokenType.NUMBER)
-        {
-            int negativeMultiplier = 1;
-            if (matchAndRemove(tokenType.MINUS) != null)
+
+            if (matchAndRemove(tokenType.RPAREN) == null)
             {
-                negativeMultiplier = -1;
+                throw new SyntaxErrorException("Unenclosed parenthesized expression while parsing on line "
+                                                + lineNumber + "."
+                                                );
             }
 
+            return parenthesizedExpressionNode;
+        }
+
+        int negativeMultiplier = 1;
+
+        if (matchAndRemove(tokenType.NEGATE) != null)
+        {
+            negativeMultiplier = -1;
+        }
+
+        if (peek(0).getType() == tokenType.NUMBER)
+        {
             return determineAndCreateNumberNode(negativeMultiplier);
         }
         else
@@ -200,6 +254,13 @@ public class Parser
         }
     }
 
+    /**
+     * Creates and returns a RealNode or IntegerNode depending on the next Token's value
+     * and negates its value according to the incoming multiplier.
+     *
+     * @param negativeMultiplier Incoming multiplier.
+     * @return RealNode or IntegerNode depending on the Token's value.
+     */
     private ASTNode determineAndCreateNumberNode(int negativeMultiplier)
     {
         Token numberToken;
@@ -213,8 +274,12 @@ public class Parser
             return null;
         }
 
-        return numberToken.isRealNumber() ? new RealNode(Float.parseFloat(numberToken.getValue()) * negativeMultiplier, lineNumber) :
-                                            new IntegerNode(Integer.parseInt(numberToken.getValue()) * negativeMultiplier, lineNumber);
+        return numberToken.isRealNumber() ? new RealNode(Float.parseFloat(
+                                                    numberToken.getValue()) * negativeMultiplier, lineNumber
+                                            ) :
+                                            new IntegerNode(Integer.parseInt(
+                                                    numberToken.getValue()) * negativeMultiplier, lineNumber
+                                            );
     }
 
     /**

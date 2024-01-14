@@ -1,3 +1,7 @@
-4 * 3 / 4 - 4 * 9 mod 4 * 903 + 9 - ~4
+define hello(testInt: integer; testReal: real; testBool: boolean; testString: string; testChar: character)
+variables hi: string
+constants hey = 40
+    2 + 2
 
-3 + 4 - ~4  + 90123.3
+define second()
+    2 + 4

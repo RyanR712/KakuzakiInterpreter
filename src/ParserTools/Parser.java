@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ParserTools.Nodes.ASTNode;
 import CrossStageTools.Token;
@@ -18,6 +19,10 @@ import ParserTools.Nodes.DataTypeNodes.IntegerNode;
 import ParserTools.Nodes.DataTypeNodes.RealNode;
 import ParserTools.Nodes.MathOpNode;
 import ParserTools.Nodes.MathOpNode.operationType;
+import ParserTools.Nodes.StructureNodes.FunctionNode;
+import ParserTools.Nodes.StructureNodes.ProgramNode;
+import ParserTools.Nodes.StructureNodes.StatementNodes.StatementNode;
+import ParserTools.Nodes.StructureNodes.StatementNodes.VariableNode;
 
 public class Parser
 {
@@ -39,14 +44,16 @@ public class Parser
      *
      * @throws SyntaxErrorException If any methods in the call stack throw Exceptions.
      */
-    public void parse() throws SyntaxErrorException
+    public ProgramNode parse() throws SyntaxErrorException
     {
-        ASTNode nodeToAdd;
-        while (!tokenList.isEmpty() && (nodeToAdd = expression()) != null)
+        ProgramNode program = new ProgramNode(new HashMap<>());
+        FunctionNode functionToAdd;
+        while (!tokenList.isEmpty() && (functionToAdd = function()) != null)
         {
-            nodeList.add(nodeToAdd);
-            expectOneOrMoreEOLs();
+            program.addFunction(functionToAdd);
         }
+
+        return program;
     }
 
     /**
@@ -106,6 +113,200 @@ public class Parser
         return dumpString;
     }
 
+    private FunctionNode function() throws SyntaxErrorException
+    {
+        if (matchAndRemove(tokenType.DEFINE) == null)
+        {
+            return null;
+        }
+
+        ArrayList<StatementNode> statements = null;
+        ArrayList<VariableNode> parameters = null, variables = new ArrayList<>();
+
+        String functionName;
+
+        functionName = matchAndRemove(tokenType.IDENTIFIER).getValue();
+
+        parameters = handleParameters();
+
+        while (peek(0).getType() == tokenType.CONSTANTS || peek(0).getType() == tokenType.VARIABLES)
+        {
+            variables.addAll(peek(0).getType() == tokenType.CONSTANTS ? handleConstants() : handleVariables());
+        }
+
+        if (matchAndRemove(tokenType.INDENT) == null)
+        {
+            throw new SyntaxErrorException("Indent expected on line " + lineNumber + ".");
+        }
+
+        ASTNode expressionNode;
+
+        while ((expressionNode = expression()) != null)
+        {
+            System.out.println(expressionNode);
+            expectOneOrMoreEOLs();
+        }
+
+        if (matchAndRemove(tokenType.DEDENT) == null)
+        {
+            throw new SyntaxErrorException("Dedent expected on line " + lineNumber + ".");
+        }
+
+        return new FunctionNode(null, parameters, variables, functionName, lineNumber);
+    }
+
+    //private ASTNode executeSeriesOfMatchAndRemoves(variadic?)
+
+    private ArrayList<VariableNode> handleParameters() throws SyntaxErrorException
+    {
+        if (matchAndRemove(tokenType.LPAREN) == null)
+        {
+            throw new SyntaxErrorException("Left parenthesis in function definition expected on line " + lineNumber
+                                            + ".");
+        }
+
+        ArrayList<VariableNode> parameters = new ArrayList<>();
+
+        while (peek(0).getType() == tokenType.IDENTIFIER)
+        {
+            parameters.add(handleParameter());
+        }
+
+        if (matchAndRemove(tokenType.RPAREN) == null)
+        {
+            throw new SyntaxErrorException("Right parenthesis in function definition expected on line " + lineNumber
+                                            + ".");
+        }
+
+        expectOneOrMoreEOLs();
+
+        return parameters;
+    }
+
+    private VariableNode handleParameter() throws SyntaxErrorException
+    {
+        String name;
+
+        tokenType variableType;
+
+        name = matchAndRemove(tokenType.IDENTIFIER).getValue();
+
+        if (matchAndRemove(tokenType.COLON) == null)
+        {
+            throw new SyntaxErrorException("Expected COLON Token between parameter identifier and type declaration on line " + lineNumber +
+                                            ".");
+        }
+
+        if ((variableType = matchAndRemoveDataTypeToken().getType()) == null)
+        {
+            throw new SyntaxErrorException("Expected a data type tokenType after COLON on " + lineNumber + ".");
+        }
+
+        if (peek(0).getType() == tokenType.SEMICOLON && peek(1).getType() != tokenType.IDENTIFIER)
+        {
+            throw new SyntaxErrorException("Expected IDENTIFIER Token after SEMICOLON Token on " + lineNumber + ".");
+        }
+        else
+        {
+            matchAndRemove(tokenType.SEMICOLON);
+            return new VariableNode(name, variableType, lineNumber, true);
+        }
+    }
+
+    /**
+     * Matches, removes and returns one of the following tokenTypes.
+     * INTEGER, REAL, CHARACTER, STRING, BOOLEAN
+     *
+     * @return One of the above tokenTypes. Null if none of them were found.
+     */
+    private Token matchAndRemoveDataTypeToken()
+    {
+        Token dataTypeToken;
+        if ((dataTypeToken = matchAndRemove(tokenType.INTEGER)) != null ||
+            (dataTypeToken = matchAndRemove(tokenType.REAL)) != null ||
+            (dataTypeToken = matchAndRemove(tokenType.CHARACTER)) != null ||
+            (dataTypeToken = matchAndRemove(tokenType.STRING)) != null ||
+            (dataTypeToken = matchAndRemove(tokenType.BOOLEAN)) != null)
+        {
+            return dataTypeToken;
+        }
+        else return null;
+    }
+
+    private ArrayList<VariableNode> handleConstants() throws SyntaxErrorException
+    {
+        ArrayList<VariableNode> constants = new ArrayList<>();
+
+        String name = "";
+
+        if (matchAndRemove(tokenType.CONSTANTS) == null)
+        {
+            throw new SyntaxErrorException("Expected CONSTANTS Token on line " + lineNumber + ".");
+        }
+
+        if ((name = matchAndRemove(tokenType.IDENTIFIER).getValue()) == null)
+        {
+            throw new SyntaxErrorException("Expected IDENTIFIER Token after CONSTANTS Token on line " + lineNumber
+                                            + ".");
+        }
+
+        if (matchAndRemove(tokenType.EQUAL) == null)
+        {
+            throw new SyntaxErrorException("Expected EQUAL Token after IDENTIFIER TOKEN on line " + lineNumber + ".");
+        }
+
+        int negationMultiplier = matchAndRemoveNegation();
+
+        constants.add(new VariableNode(name, tokenType.NUMBER, determineAndCreateNumberNode(negationMultiplier).toString(), lineNumber, false));
+
+        expectOneOrMoreEOLs();
+
+        return constants;
+    }
+
+    private ArrayList<VariableNode> handleVariables() throws SyntaxErrorException
+    {
+        if (matchAndRemove(tokenType.VARIABLES) == null)
+        {
+            throw new SyntaxErrorException("Expected VARIABLES Token on line " + lineNumber + ".");
+        }
+
+        boolean isThereAnotherVariable = peek(0).getType() == tokenType.IDENTIFIER;
+
+        ArrayList<VariableNode> variables = new ArrayList<>();
+
+        tokenType dataType;
+
+        while (isThereAnotherVariable)
+        {
+            variables.add(new VariableNode(matchAndRemove(tokenType.IDENTIFIER).getValue(), tokenType.IDENTIFIER,
+                                            lineNumber, true));
+            if (peek(0).getType() != tokenType.COMMA)
+            {
+                isThereAnotherVariable = false;
+            }
+        }
+
+        if (matchAndRemove(tokenType.COLON) == null)
+        {
+            throw new SyntaxErrorException("Expected COLON after all variables on line " + lineNumber + ".");
+        }
+
+        if ((dataType = matchAndRemoveDataTypeToken().getType()) == null)
+        {
+            throw new SyntaxErrorException("Expected data type tokenType after all variables on line " + lineNumber + ".");
+        }
+
+        for (int i = 0; i < variables.size(); i++)
+        {
+            variables.get(i).setType(dataType);
+        }
+
+        expectOneOrMoreEOLs();
+
+        return variables;
+    }
+
     /**
      * Removes and returns an expression ASTNode.
      * An expression is a number or a MathOpNode with addition or subtraction as its operation type.
@@ -144,7 +345,7 @@ public class Parser
      *
      * @return operationType on the expression priority or null if no such operator is found.
      */
-    private operationType handleExpressionOperator()
+    private operationType handleExpressionOperator() throws SyntaxErrorException
     {
         if (matchAndRemove(tokenType.ADD) != null)
         {
@@ -153,6 +354,10 @@ public class Parser
         else if (matchAndRemove(tokenType.MINUS) != null)
         {
             return operationType.SUB;
+        }
+        else if (matchAndRemove(tokenType.NEGATE) != null)
+        {
+            throw new SyntaxErrorException("Stray negation operator found on line " + lineNumber + ".");
         }
         else
         {
@@ -195,7 +400,7 @@ public class Parser
      *
      * @return operationType on the term priority or null if no such operator is found.
      */
-    private operationType handleTermOperator()
+    private operationType handleTermOperator() throws SyntaxErrorException
     {
         if (matchAndRemove(tokenType.MULT) != null)
         {
@@ -208,6 +413,10 @@ public class Parser
         else if (matchAndRemove(tokenType.MOD) != null)
         {
             return operationType.MOD;
+        }
+        else if (matchAndRemove(tokenType.NEGATE) != null)
+        {
+            throw new SyntaxErrorException("Stray negation operator found on line " + lineNumber + ".");
         }
         else
         {
@@ -237,12 +446,7 @@ public class Parser
             return parenthesizedExpressionNode;
         }
 
-        int negativeMultiplier = 1;
-
-        if (matchAndRemove(tokenType.NEGATE) != null)
-        {
-            negativeMultiplier = -1;
-        }
+        int negativeMultiplier = matchAndRemoveNegation();
 
         if (peek(0).getType() == tokenType.NUMBER)
         {
@@ -252,6 +456,11 @@ public class Parser
         {
             return null;
         }
+    }
+
+    private int matchAndRemoveNegation()
+    {
+        return matchAndRemove(tokenType.NEGATE) != null ? -1 : 1;
     }
 
     /**

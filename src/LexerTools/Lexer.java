@@ -250,8 +250,8 @@ public class Lexer
     {
         if (currentChar == ':' || currentChar == '<' || currentChar == '>')
         {
-            handleMultiCharacterPunctuation(currentLine, currentIndex, currentChar);
-            return 1 + currentIndex;
+            return handleMultiCharacterPunctuation(currentLine, currentIndex, currentChar) ? currentIndex + 1 :
+                                                                                             currentIndex;
         }
         else
         {
@@ -268,7 +268,7 @@ public class Lexer
      * @param currentIndex Incoming index.
      * @param currentChar Incoming character.
      */
-    private void handleMultiCharacterPunctuation(String currentLine, int currentIndex, char currentChar)
+    private boolean handleMultiCharacterPunctuation(String currentLine, int currentIndex, char currentChar)
     {
         char nextChar = ' ';
         try
@@ -280,16 +280,20 @@ public class Lexer
 
         if (currentChar == ':' || currentChar == '>' || currentChar == '<')
         {
-            boolean isLoneLessThanCharacter = currentChar == '<' && !(nextChar == '=' || nextChar == '>');
-            if (isLoneLessThanCharacter)
+            boolean isLonePunctuation = currentChar == '<' && !(nextChar == '=' || nextChar == '>') ||
+                                        (currentChar == ':' && nextChar != '=');
+            if (isLonePunctuation)
             {
                 addPunctuationToken(currentChar);
+                return false;
             }
             else
             {
                 addPunctuationToken(currentChar, nextChar);
+                return true;
             }
         }
+        return false;
     }
 
     /**

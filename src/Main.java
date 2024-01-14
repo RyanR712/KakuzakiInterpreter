@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 
 import CrossStageTools.Token;
 import LexerTools.Lexer;
+import ParserTools.Nodes.StructureNodes.ProgramNode;
 import ParserTools.Parser;
 
 public class Main
@@ -56,11 +57,15 @@ public class Main
                 throw new Exception("Lexing failed.");
             }
 
+            lexer.writeDebugOutput();
+
             Parser parser = new Parser(lexer.getTokenList());
+
+            ProgramNode program;
 
             try
             {
-                parser.parse();
+                program = parser.parse();
             }
             catch (Exception e)
             {
@@ -71,7 +76,7 @@ public class Main
                 throw new Exception("Parsing failed.");
             }
 
-            System.out.println(parser.getNodeList());
+            System.out.println(program);
         }
     }
 }

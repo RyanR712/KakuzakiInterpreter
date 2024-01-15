@@ -1,7 +1,28 @@
-define hello(testInt: integer; testReal: real; testBool: boolean; testString: string; testChar: character)
-variables hi: string
-constants hey = 40
+define hello(testInt: integer)
+variables hello, ey : integer
+constants hi    = 42
+variables yo: string
+constants fortyFour, fortyFive, fortySix= ~444546
     2 + 2
 
-define second()
+
+
+define goodbye()
     2 + 4
+    4 + 0.94
+
+
+
+
+
+
+
+
+
+
+
+
+
+define yellow(testReal: real; testBoolean: boolean)
+constants yeeeeeeeeeeeeeeeeeeee42 = 42
+    2 + ~90.09

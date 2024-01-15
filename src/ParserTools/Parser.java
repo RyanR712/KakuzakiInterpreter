@@ -129,7 +129,7 @@ public class Parser
 
         parameters = handleParameters();
 
-        while (peek(0).getType() == tokenType.CONSTANTS || peek(0).getType() == tokenType.VARIABLES)
+        while (peek(0).getType() != tokenType.INDENT)
         {
             variables.addAll(peek(0).getType() == tokenType.CONSTANTS ? handleConstants() : handleVariables());
         }
@@ -237,31 +237,48 @@ public class Parser
     {
         ArrayList<VariableNode> constants = new ArrayList<>();
 
-        String name = "";
-
         if (matchAndRemove(tokenType.CONSTANTS) == null)
         {
             throw new SyntaxErrorException("Expected CONSTANTS Token on line " + lineNumber + ".");
         }
 
-        if ((name = matchAndRemove(tokenType.IDENTIFIER).getValue()) == null)
+        while (peek(1).getType() == tokenType.COMMA)
         {
-            throw new SyntaxErrorException("Expected IDENTIFIER Token after CONSTANTS Token on line " + lineNumber
-                                            + ".");
+            constants.add(handleConstant());
+            matchAndRemove(tokenType.COMMA);
         }
+
+        constants.add(handleConstant());
 
         if (matchAndRemove(tokenType.EQUAL) == null)
         {
-            throw new SyntaxErrorException("Expected EQUAL Token after IDENTIFIER TOKEN on line " + lineNumber + ".");
+            throw new SyntaxErrorException("Expected EQUAL Token after IDENTIFIER on line " + lineNumber + ".");
         }
 
         int negationMultiplier = matchAndRemoveNegation();
+        String valueString = determineAndCreateNumberNode(negationMultiplier).toString();
 
-        constants.add(new VariableNode(name, tokenType.NUMBER, determineAndCreateNumberNode(negationMultiplier).toString(), lineNumber, false));
+        for (int i = 0; i < constants.size(); i++)
+        {
+            constants.get(i).setType(tokenType.NUMBER);
+            constants.get(i).setValue(valueString);
+        }
 
         expectOneOrMoreEOLs();
 
         return constants;
+    }
+
+    private VariableNode handleConstant() throws SyntaxErrorException
+    {
+        String name;
+        if ((name = matchAndRemove(tokenType.IDENTIFIER).getValue()) == null)
+        {
+            throw new SyntaxErrorException("Expected IDENTIFIER Token after CONSTANTS Token on line " + lineNumber
+                    + ".");
+        }
+
+        return new VariableNode(name, null, lineNumber, false);
     }
 
     private ArrayList<VariableNode> handleVariables() throws SyntaxErrorException
@@ -271,21 +288,17 @@ public class Parser
             throw new SyntaxErrorException("Expected VARIABLES Token on line " + lineNumber + ".");
         }
 
-        boolean isThereAnotherVariable = peek(0).getType() == tokenType.IDENTIFIER;
-
         ArrayList<VariableNode> variables = new ArrayList<>();
 
         tokenType dataType;
 
-        while (isThereAnotherVariable)
+        while (peek(1).getType() == tokenType.COMMA)
         {
-            variables.add(new VariableNode(matchAndRemove(tokenType.IDENTIFIER).getValue(), tokenType.IDENTIFIER,
-                                            lineNumber, true));
-            if (peek(0).getType() != tokenType.COMMA)
-            {
-                isThereAnotherVariable = false;
-            }
+            variables.add(handleVariable());
+            matchAndRemove(tokenType.COMMA);
         }
+
+        variables.add(handleVariable());
 
         if (matchAndRemove(tokenType.COLON) == null)
         {
@@ -305,6 +318,20 @@ public class Parser
         expectOneOrMoreEOLs();
 
         return variables;
+    }
+
+    private VariableNode handleVariable() throws SyntaxErrorException
+    {
+        String name;
+        if ((name = matchAndRemove(tokenType.IDENTIFIER).getValue()) == null)
+        {
+            throw new SyntaxErrorException("Expected IDENTIFIER Token after VARIABLES Token on line " + lineNumber
+                    + ".");
+        }
+
+        return new VariableNode(name, null, lineNumber, true);
+        //TODO: Combine this and HandleConstant into one method that only differs in Syntax Error Exception message
+        //and VariableNode(x, y, z, true | false).
     }
 
     /**
@@ -458,6 +485,11 @@ public class Parser
         }
     }
 
+    /**
+     * Matches and removes a NEGATE Token, if one exists.
+     *
+     * @return -1 if a NEGATE Token was removed, 1 if a NEGATE Token was not removed.
+     */
     private int matchAndRemoveNegation()
     {
         return matchAndRemove(tokenType.NEGATE) != null ? -1 : 1;

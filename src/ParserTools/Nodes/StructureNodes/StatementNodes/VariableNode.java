@@ -13,6 +13,7 @@ public class VariableNode extends ASTNode
 
     private boolean isChangeable;
 
+    //TODO: try to receive the type and line number from a Token object?
     public VariableNode(String incomingName, tokenType incomingType, int incomingLineNumber, boolean changeable)
     {
         name = incomingName;
@@ -21,6 +22,7 @@ public class VariableNode extends ASTNode
         isChangeable = changeable;
     }
 
+    //TODO: try to receive the type and value and line number from a Token object?
     public VariableNode(String incomingName, tokenType incomingType, String incomingValue, int incomingLineNumber, boolean changeable)
     {
         name = incomingName;
@@ -33,6 +35,11 @@ public class VariableNode extends ASTNode
     public void setType(tokenType incomingType)
     {
         type = incomingType;
+    }
+
+    public void setValue(String incomingValue)
+    {
+        value = incomingValue;
     }
 
     @Override

@@ -72,7 +72,15 @@ public class FunctionNode extends ASTNode
             functionString += variableList.get(i) + ",\n";
         }
 
-        functionString += "\nWith no statements."; //TODO: Update to include statement nodes.
+        for (int i = 0; i < statementList.size(); i++)
+        {
+            if (i == 0)
+            {
+                functionString += "\nWith statements:\n\t";
+            }
+
+            functionString += "\t" + statementList.get(i) + ",\n";
+        }
 
         return functionString;
     }

@@ -1,28 +1,4 @@
 define hello(testInt: integer)
-variables hello, ey : integer
-constants hi    = 42
-variables yo: string
-constants fortyFour, fortyFive, fortySix= ~444546
-    2 + 2
-
-
-
-define goodbye()
-    2 + 4
-    4 + 0.94
-
-
-
-
-
-
-
-
-
-
-
-
-
-define yellow(testReal: real; testBoolean: boolean)
-constants yeeeeeeeeeeeeeeeeeeee42 = 42
-    2 + ~90.09
+variables test : integer
+constants yello = ~0.31
+    test[test[49 + 4]] := test[4] / 8 + random

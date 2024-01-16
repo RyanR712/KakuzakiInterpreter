@@ -126,6 +126,7 @@ public class Lexer
      */
     public ArrayList<Token> lexAndReturnTokenList(ArrayList<String> incomingLines) throws Exception
     {
+        lex(incomingLines);
         return getTokenList();
     }
 
@@ -613,5 +614,7 @@ public class Lexer
         punctuationMap.put(",", tokenType.COMMA);
         punctuationMap.put("(", tokenType.LPAREN);
         punctuationMap.put(")", tokenType.RPAREN);
+        punctuationMap.put("[", tokenType.LBRACK);
+        punctuationMap.put("]", tokenType.RBRACK);
     }
 }

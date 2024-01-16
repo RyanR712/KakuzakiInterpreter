@@ -31,6 +31,11 @@ public class Parser
 
     private int lineNumber;
 
+    /**
+     * Initializes a Parser with the incoming Token ArrayList, a new ASTNode ArrayList and a lineNumber of 1.
+     *
+     * @param incomingTokenList incoming Token ArrayList.
+     */
     public Parser(ArrayList<Token> incomingTokenList)
     {
         tokenList = incomingTokenList;
@@ -40,9 +45,10 @@ public class Parser
     }
 
     /**
-     * Produces and adds ASTNodes to this Parser's ASTNode list so long as there are ASTNodes to add.
+     * Creates and returns a ProgramNode.
      *
      * @throws SyntaxErrorException If any methods in the call stack throw Exceptions.
+     * @see "https://github.com/RyanR712/KakuzakiInterpreter/wiki for detailed language definition."
      */
     public ProgramNode parse() throws SyntaxErrorException
     {
@@ -113,6 +119,12 @@ public class Parser
         return dumpString;
     }
 
+    /**
+     * Creates and returns one FunctionNode with parameters, variables, constants and statements in its scope.
+     *
+     * @return FunctionNode with parameters, variables, constants and statements in its scope.
+     * @throws SyntaxErrorException If the Kakuzaki syntax for functions is violated.
+     */
     private FunctionNode function() throws SyntaxErrorException
     {
         if (matchAndRemove(tokenType.DEFINE) == null)
@@ -121,11 +133,11 @@ public class Parser
         }
 
         ArrayList<StatementNode> statements = null;
-        ArrayList<VariableNode> parameters = null, variables = new ArrayList<>();
+        ArrayList<VariableNode> parameters, variables = new ArrayList<>();
 
-        String functionName;
+        String functionName = matchAndRemove(tokenType.IDENTIFIER).getValue();
 
-        functionName = matchAndRemove(tokenType.IDENTIFIER).getValue();
+        int definitionLineNumber = lineNumber;
 
         parameters = handleParameters();
 
@@ -134,10 +146,7 @@ public class Parser
             variables.addAll(peek(0).getType() == tokenType.CONSTANTS ? handleConstants() : handleVariables());
         }
 
-        if (matchAndRemove(tokenType.INDENT) == null)
-        {
-            throw new SyntaxErrorException("Indent expected on line " + lineNumber + ".");
-        }
+        matchAndRemoveAndTestForException(tokenType.INDENT, "Indent expected on line " + lineNumber + ".");
 
         ASTNode expressionNode;
 
@@ -147,23 +156,21 @@ public class Parser
             expectOneOrMoreEOLs();
         }
 
-        if (matchAndRemove(tokenType.DEDENT) == null)
-        {
-            throw new SyntaxErrorException("Dedent expected on line " + lineNumber + ".");
-        }
+        matchAndRemoveAndTestForException(tokenType.DEDENT, "Dedent expected on line " + lineNumber + ".");
 
-        return new FunctionNode(null, parameters, variables, functionName, lineNumber);
+        return new FunctionNode(null, parameters, variables, functionName, definitionLineNumber);
     }
 
-    //private ASTNode executeSeriesOfMatchAndRemoves(variadic?)
-
+    /**
+     * Returns all the parameters, if any, in a function's definition.
+     *
+     * @return Parameters in a function's definition.
+     * @throws SyntaxErrorException If the Kakuzaki syntax for parameters is violated.
+     */
     private ArrayList<VariableNode> handleParameters() throws SyntaxErrorException
     {
-        if (matchAndRemove(tokenType.LPAREN) == null)
-        {
-            throw new SyntaxErrorException("Left parenthesis in function definition expected on line " + lineNumber
-                                            + ".");
-        }
+        matchAndRemoveAndTestForException(tokenType.LPAREN,
+                "Left parenthesis in function definition expected on line " + lineNumber + ".");
 
         ArrayList<VariableNode> parameters = new ArrayList<>();
 
@@ -172,35 +179,28 @@ public class Parser
             parameters.add(handleParameter());
         }
 
-        if (matchAndRemove(tokenType.RPAREN) == null)
-        {
-            throw new SyntaxErrorException("Right parenthesis in function definition expected on line " + lineNumber
-                                            + ".");
-        }
+        matchAndRemoveAndTestForException(tokenType.RPAREN,
+                "Right parenthesis in function definition expected on line " + lineNumber + ".");
 
         expectOneOrMoreEOLs();
 
         return parameters;
     }
 
+    /**
+     * Returns one parameter.
+     *
+     * @return One parameter.
+     * @throws SyntaxErrorException If the Kakuzaki syntax is violated for semicolons in a function definition.
+     */
     private VariableNode handleParameter() throws SyntaxErrorException
     {
-        String name;
+        String name = matchAndRemove(tokenType.IDENTIFIER).getValue();
 
-        tokenType variableType;
+        matchAndRemoveAndTestForException(tokenType.COLON,
+                "Expected COLON Token between parameter identifier and type declaration on line " + lineNumber + ".");
 
-        name = matchAndRemove(tokenType.IDENTIFIER).getValue();
-
-        if (matchAndRemove(tokenType.COLON) == null)
-        {
-            throw new SyntaxErrorException("Expected COLON Token between parameter identifier and type declaration on line " + lineNumber +
-                                            ".");
-        }
-
-        if ((variableType = matchAndRemoveDataTypeToken().getType()) == null)
-        {
-            throw new SyntaxErrorException("Expected a data type tokenType after COLON on " + lineNumber + ".");
-        }
+        tokenType variableType = matchAndRemoveAndGetDataTypeAndTestForException();
 
         if (peek(0).getType() == tokenType.SEMICOLON && peek(1).getType() != tokenType.IDENTIFIER)
         {
@@ -233,27 +233,28 @@ public class Parser
         else return null;
     }
 
+    /**
+     * Returns all the constant declarations on one line.
+     *
+     * @return ArrayList containing all the constant declarations on one line.
+     * @throws SyntaxErrorException If the Kakuzaki syntax for constants is violated.
+     */
     private ArrayList<VariableNode> handleConstants() throws SyntaxErrorException
     {
-        ArrayList<VariableNode> constants = new ArrayList<>();
+        matchAndRemoveAndTestForException(tokenType.CONSTANTS, "Expected CONSTANTS Token on line " + lineNumber + ".");
 
-        if (matchAndRemove(tokenType.CONSTANTS) == null)
-        {
-            throw new SyntaxErrorException("Expected CONSTANTS Token on line " + lineNumber + ".");
-        }
+        ArrayList<VariableNode> constants = new ArrayList<>();
 
         while (peek(1).getType() == tokenType.COMMA)
         {
-            constants.add(handleConstant());
+            constants.add(handleConstantOrVariable(false));
             matchAndRemove(tokenType.COMMA);
         }
 
-        constants.add(handleConstant());
+        constants.add(handleConstantOrVariable(false));
 
-        if (matchAndRemove(tokenType.EQUAL) == null)
-        {
-            throw new SyntaxErrorException("Expected EQUAL Token after IDENTIFIER on line " + lineNumber + ".");
-        }
+        matchAndRemoveAndTestForException(tokenType.EQUAL,
+                                          "Expected EQUAL Token after IDENTIFIER on line " + lineNumber + ".");
 
         int negationMultiplier = matchAndRemoveNegation();
         String valueString = determineAndCreateNumberNode(negationMultiplier).toString();
@@ -269,24 +270,15 @@ public class Parser
         return constants;
     }
 
-    private VariableNode handleConstant() throws SyntaxErrorException
-    {
-        String name;
-        if ((name = matchAndRemove(tokenType.IDENTIFIER).getValue()) == null)
-        {
-            throw new SyntaxErrorException("Expected IDENTIFIER Token after CONSTANTS Token on line " + lineNumber
-                    + ".");
-        }
-
-        return new VariableNode(name, null, lineNumber, false);
-    }
-
+    /**
+     * Returns all the variable declarations on one line.
+     *
+     * @return ArrayList containing all the variable declarations on one line.
+     * @throws SyntaxErrorException If the Kakuzaki syntax for variables is violated.
+     */
     private ArrayList<VariableNode> handleVariables() throws SyntaxErrorException
     {
-        if (matchAndRemove(tokenType.VARIABLES) == null)
-        {
-            throw new SyntaxErrorException("Expected VARIABLES Token on line " + lineNumber + ".");
-        }
+        matchAndRemoveAndTestForException(tokenType.VARIABLES, "Expected VARIABLES Token on line " + lineNumber + ".");
 
         ArrayList<VariableNode> variables = new ArrayList<>();
 
@@ -294,21 +286,16 @@ public class Parser
 
         while (peek(1).getType() == tokenType.COMMA)
         {
-            variables.add(handleVariable());
+            variables.add(handleConstantOrVariable(true));
             matchAndRemove(tokenType.COMMA);
         }
 
-        variables.add(handleVariable());
+        variables.add(handleConstantOrVariable(true));
 
-        if (matchAndRemove(tokenType.COLON) == null)
-        {
-            throw new SyntaxErrorException("Expected COLON after all variables on line " + lineNumber + ".");
-        }
+        matchAndRemoveAndTestForException(tokenType.COLON,
+                                          "Expected COLON after all variables on line " + lineNumber + ".");
 
-        if ((dataType = matchAndRemoveDataTypeToken().getType()) == null)
-        {
-            throw new SyntaxErrorException("Expected data type tokenType after all variables on line " + lineNumber + ".");
-        }
+        dataType = matchAndRemoveAndGetDataTypeAndTestForException();
 
         for (int i = 0; i < variables.size(); i++)
         {
@@ -320,18 +307,70 @@ public class Parser
         return variables;
     }
 
-    private VariableNode handleVariable() throws SyntaxErrorException
+    /**
+     * Creates and returns a VariableNode, which is variable or constant depending on the incoming boolean.
+     * If the boolean is true, this is a variable. If the boolean is false, this is a constant.
+     *
+     * @param isChangeable Incoming boolean.
+     * @return VariableNode with appropriate changeability.
+     * @throws SyntaxErrorException If matchAndRemoveAndGetValueAndTestForException() throws a SyntaxErrorException.
+     */
+    private VariableNode handleConstantOrVariable(boolean isChangeable) throws SyntaxErrorException
+    {
+        return new VariableNode(matchAndRemoveAndGetValueAndTestForException(), null, lineNumber, isChangeable);
+    }
+
+    /**
+     * Matches and removes the incoming tokenType, and if that tokenType is not found,
+     * throws a SyntaxErrorException with the incoming String as its message.
+     *
+     * @param type Incoming tokenType.
+     * @param message Incoming String.
+     * @throws SyntaxErrorException If type was not found.
+     */
+    private void matchAndRemoveAndTestForException(tokenType type, String message) throws SyntaxErrorException
+    {
+        if (matchAndRemove(type) == null)
+        {
+            throw new SyntaxErrorException(message);
+        }
+    }
+
+    /**
+     * Matches and removes an IDENTIFIER Token and returns its value.
+     *
+     * @return Removed IDENTIFIER Token's value.
+     * @throws SyntaxErrorException If no IDENTIFIER Token was found.
+     */
+    private String matchAndRemoveAndGetValueAndTestForException() throws SyntaxErrorException
     {
         String name;
+
         if ((name = matchAndRemove(tokenType.IDENTIFIER).getValue()) == null)
         {
-            throw new SyntaxErrorException("Expected IDENTIFIER Token after VARIABLES Token on line " + lineNumber
+            throw new SyntaxErrorException("Expected IDENTIFIER Token on line " + lineNumber + " but found " + peek(0)
                     + ".");
         }
 
-        return new VariableNode(name, null, lineNumber, true);
-        //TODO: Combine this and HandleConstant into one method that only differs in Syntax Error Exception message
-        //and VariableNode(x, y, z, true | false).
+        return name;
+    }
+
+    /**
+     * Matches, removes and returns a data type tokenType.
+     *
+     * @return Data type tokenType.
+     * @throws SyntaxErrorException If no such tokenType was found.
+     */
+    private tokenType matchAndRemoveAndGetDataTypeAndTestForException() throws SyntaxErrorException
+    {
+        tokenType dataType;
+
+        if ((dataType = matchAndRemoveDataTypeToken().getType()) == null)
+        {
+            throw new SyntaxErrorException("Expected data type tokenType on line " + lineNumber + ".");
+        }
+
+        return dataType;
     }
 
     /**

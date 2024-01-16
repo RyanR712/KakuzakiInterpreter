@@ -6,13 +6,23 @@ package ParserTools.Nodes;
 
 public class MathOpNode extends ASTNode
 {
-    public enum operationType {ADD, SUB, MULT, DIV, MOD};
+    public enum operationType {ADD, SUB, MULT, DIV, MOD}
 
     private ASTNode leftOperand, rightOperand;
     private operationType opType;
 
     private int lineNumber;
 
+    /**
+     * Constructs a MathOpNode with the former incoming ASTNode as its left operand,
+     * the incoming operationType as its operation type, the latter incoming ASTNode as its right operand,
+     * and the incoming int as its line number.
+     *
+     * @param incomingLeftOperand Former incoming ASTNode.
+     * @param incomingOpType Incoming operationType.
+     * @param incomingRightOperand Latter incoming ASTNode.
+     * @param line Incoming int.
+     */
     public MathOpNode(ASTNode incomingLeftOperand, operationType incomingOpType, ASTNode incomingRightOperand,
                       int line)
     {

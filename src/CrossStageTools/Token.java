@@ -80,7 +80,7 @@ public class Token
      */
     public String getValue()
     {
-        return value;
+        return value == null ? "no value" : value;
     }
 
     /**

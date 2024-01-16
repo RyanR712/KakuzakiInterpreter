@@ -6,9 +6,11 @@ package ParserTools.Nodes;
 
 public abstract class ASTNode
 {
-    private int lineNumber;
-
     public abstract String toString();
 
+    /**
+     * Returns the line number this ASTNode is on.
+     * @return line number this ASTNode is on.
+     */
     public abstract int getLineNumber();
 }

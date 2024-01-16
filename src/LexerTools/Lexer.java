@@ -28,7 +28,7 @@ public class Lexer
     private boolean indentsHandled;
 
     /**
-     * Instantiates the Lexer with an empty Token list, empty maps and a line number.
+     * Instantiates the Lexer with an empty Token list, empty maps and a line number of 1.
      */
     public Lexer()
     {

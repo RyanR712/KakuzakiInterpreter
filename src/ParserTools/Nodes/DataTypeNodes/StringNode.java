@@ -10,6 +10,12 @@ public class StringNode extends DataTypeNode
 
     private int lineNumber;
 
+    /**
+     * Constructs a String ASTNode with the incoming String as its data with the incoming int as its line number.
+     *
+     * @param incomingData Incoming String.
+     * @param line Incoming int.
+     */
     public StringNode(String incomingData, int line)
     {
         data = incomingData;

@@ -10,6 +10,12 @@ public class RealNode extends DataTypeNode
 
     private int lineNumber;
 
+    /**
+     * Constructs a Real ASTNode with the incoming float as its data and the incoming int as its line number.
+     *
+     * @param incomingData Incoming float.
+     * @param line Incoming int.
+     */
     public RealNode(float incomingData, int line)
     {
         data = incomingData;

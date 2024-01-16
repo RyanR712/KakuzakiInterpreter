@@ -10,6 +10,12 @@ public class BooleanNode extends DataTypeNode
 
     private int lineNumber;
 
+    /**
+     * Constructs a Boolean ASTNode with the incoming boolean as its data with the incoming int as its line number.
+     *
+     * @param incomingData Incoming char.
+     * @param line Incoming int.
+     */
     public BooleanNode(boolean incomingData, int line)
     {
         data = incomingData;

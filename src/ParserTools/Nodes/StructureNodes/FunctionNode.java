@@ -1,3 +1,7 @@
+/**
+ * Describes one Kakuzaki function.
+ */
+
 package ParserTools.Nodes.StructureNodes;
 
 import java.util.ArrayList;
@@ -15,6 +19,17 @@ public class FunctionNode extends ASTNode
 
     private int lineNumber;
 
+    /**
+     * Constructs a FunctionNode with the incoming ArrayLists as, respectively, the FunctionNode's statements,
+     * the FunctionNode's parameters, the FunctionNode's variables and constants, the incoming String as its name,
+     * and the incoming int as the line number the FunctionNode is defined on.
+     *
+     * @param statements Incoming ArrayList of statements.
+     * @param parameters Incoming ArrayList of parameters.
+     * @param variables Incoming ArrayList of variables and constants.
+     * @param incomingName Incoming String.
+     * @param incomingLineNumber Incoming int.
+     */
     public FunctionNode(ArrayList<StatementNode> statements, ArrayList<VariableNode> parameters,
                         ArrayList<VariableNode> variables, String incomingName, int incomingLineNumber)
     {
@@ -25,6 +40,10 @@ public class FunctionNode extends ASTNode
         lineNumber = incomingLineNumber;
     }
 
+    /**
+     * Returns the name of this FunctionNode.
+     * @return Name of this FunctionNode.
+     */
     public String getName()
     {
         return name;

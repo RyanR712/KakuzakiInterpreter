@@ -252,6 +252,8 @@ public class LexerTest
         punctuationSoupList.add(new Token(tokenType.COMMA, 3));
         punctuationSoupList.add(new Token(tokenType.LPAREN, 3));
         punctuationSoupList.add(new Token(tokenType.RPAREN, 3));
+        punctuationSoupList.add(new Token(tokenType.LBRACK, 3));
+        punctuationSoupList.add(new Token(tokenType.RBRACK, 3));
         punctuationSoupList.add(new Token(3));
 
         tokenListMap.put("punctuationSoup.zki", punctuationSoupList);

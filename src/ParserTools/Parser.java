@@ -18,7 +18,6 @@ import Exceptions.SyntaxErrorException;
 import ParserTools.Nodes.DataTypeNodes.IntegerNode;
 import ParserTools.Nodes.DataTypeNodes.RealNode;
 import ParserTools.Nodes.MathOpNode;
-import ParserTools.Nodes.MathOpNode.operationType;
 import ParserTools.Nodes.StructureNodes.FunctionNode;
 import ParserTools.Nodes.StructureNodes.ProgramNode;
 import ParserTools.Nodes.StructureNodes.StatementNodes.*;
@@ -135,20 +134,14 @@ public class Parser
 
         String functionName = matchAndRemove(tokenType.IDENTIFIER).getValue();
 
-
-
         int definitionLineNumber = lineNumber;
 
         parameters = handleParameters();
-
-
 
         while (peek(0).getType() != tokenType.INDENT)
         {
             variables.addAll(peek(0).getType() == tokenType.CONSTANTS ? handleConstants() : handleVariables());
         }
-
-        System.out.println("in function()");
 
         ArrayList<StatementNode> statements = handleStatements();
 
@@ -205,26 +198,6 @@ public class Parser
             matchAndRemove(tokenType.SEMICOLON);
             return new VariableNode(name, variableType, lineNumber, true);
         }
-    }
-
-    /**
-     * Matches, removes and returns one of the following tokenTypes and returns that type.
-     * INTEGER, REAL, CHARACTER, STRING, BOOLEAN
-     *
-     * @return One of the above tokenTypes. Null if none of them were found.
-     */
-    private tokenType matchAndRemoveDataTypeToken()
-    {
-        Token dataTypeToken;
-        if ((dataTypeToken = matchAndRemove(tokenType.INTEGER)) != null ||
-            (dataTypeToken = matchAndRemove(tokenType.REAL)) != null ||
-            (dataTypeToken = matchAndRemove(tokenType.CHARACTER)) != null ||
-            (dataTypeToken = matchAndRemove(tokenType.STRING)) != null ||
-            (dataTypeToken = matchAndRemove(tokenType.BOOLEAN)) != null)
-        {
-            return dataTypeToken.getType();
-        }
-        else return null;
     }
 
     /**
@@ -314,6 +287,12 @@ public class Parser
         return new VariableNode(matchAndRemoveAndGetValueAndTestForException(), null, lineNumber, isChangeable);
     }
 
+    /**
+     * Expects an INDENT Token, adds a list of StatementNodes to a function, and expects a DEDENT Token.
+     *
+     * @return A list of StatementNodes.
+     * @throws SyntaxErrorException If either expected indentation is incorrect.
+     */
     private ArrayList<StatementNode> handleStatements() throws SyntaxErrorException
     {
         matchAndRemoveAndTestForException(tokenType.INDENT, "Indent expected on line " + lineNumber + ".");
@@ -322,26 +301,34 @@ public class Parser
 
         while (peek(0).getType() != tokenType.DEDENT)
         {
-            System.out.println("in handleStatements");
             statements.add(handleStatement());
             expectOneOrMoreEOLs();
         }
-
-
 
         matchAndRemoveAndTestForException(tokenType.DEDENT, "Dedent expected on line " + lineNumber + ".");
 
         return statements;
     }
 
+    /**
+     * Handles the processing of one StatementNode.
+     *
+     * @return One StatementNode.
+     * @throws SyntaxErrorException If the parsing of some particular StatementNode fails.
+     */
     private StatementNode handleStatement() throws SyntaxErrorException
     {
         return handleAssignment();
     }
 
+    /**
+     * Creates and returns an AssignmentNode with a target VariableReferenceNode and an assignment value.
+     *
+     * @return AssignmentNode with appropriate target VariableReferenceNode and assignment value.
+     * @throws SyntaxErrorException If no ASSIGN Token was found between the target and value.
+     */
     private AssignmentNode handleAssignment() throws SyntaxErrorException
     {
-        System.out.println("in handleAssignment");
         VariableReferenceNode referencedNode = handleVariableReferenceNode();
 
         matchAndRemoveAndTestForException(tokenType.ASSIGN, "ASSIGN Token expected after variable reference on line " +
@@ -404,6 +391,48 @@ public class Parser
     }
 
     /**
+     * Matches, removes and returns one of the following tokenTypes and returns that type.
+     * INTEGER, REAL, CHARACTER, STRING, BOOLEAN
+     *
+     * @return One of the above tokenTypes. Null if none of them were found.
+     */
+    private tokenType matchAndRemoveDataTypeToken()
+    {
+        Token dataTypeToken;
+        if ((dataTypeToken = matchAndRemove(tokenType.INTEGER)) != null ||
+                (dataTypeToken = matchAndRemove(tokenType.REAL)) != null ||
+                (dataTypeToken = matchAndRemove(tokenType.CHARACTER)) != null ||
+                (dataTypeToken = matchAndRemove(tokenType.STRING)) != null ||
+                (dataTypeToken = matchAndRemove(tokenType.BOOLEAN)) != null)
+        {
+            return dataTypeToken.getType();
+        }
+        else return null;
+    }
+
+    /**
+     * Creates and returns a BooleanCompareNode with two comparands and a comparison operand.
+     *
+     * @return A BooleanCompareNode with appropriately matched and removed comparands and operand.
+     * @throws SyntaxErrorException If retrieving either comparand fails.
+     */
+    private ASTNode booleanCompare() throws SyntaxErrorException
+    {
+        ASTNode leftComparand = expression();
+
+        if (isLineEmpty())
+        {
+            return leftComparand;
+        }
+
+        tokenType compType = matchAndRemoveBooleanComparison();
+
+        ASTNode rightComparand = expression();
+
+        return new BooleanCompareNode(leftComparand, compType, rightComparand, lineNumber);
+    }
+
+    /**
      * Removes and returns an expression ASTNode.
      * An expression is a number or a MathOpNode with addition or subtraction as its operation type.
      *
@@ -422,7 +451,17 @@ public class Parser
             return leftOperand;
         }
 
-        operationType opType = handleExpressionOperator();
+        tokenType opType;
+
+        if ((opType = matchAndRemoveBooleanComparison()) != null)
+        {
+            return new BooleanCompareNode(leftOperand, opType, expression(), lineNumber);
+        }
+        else
+        {
+            opType = handleExpressionOperator();
+        }
+
         ASTNode rightOperand = expression();
 
         if (opType == null || rightOperand == null)
@@ -441,15 +480,15 @@ public class Parser
      *
      * @return operationType on the expression priority or null if no such operator is found.
      */
-    private operationType handleExpressionOperator() throws SyntaxErrorException
+    private tokenType handleExpressionOperator() throws SyntaxErrorException
     {
         if (matchAndRemove(tokenType.ADD) != null)
         {
-            return operationType.ADD;
+            return tokenType.ADD;
         }
         else if (matchAndRemove(tokenType.MINUS) != null)
         {
-            return operationType.SUB;
+            return tokenType.MINUS;
         }
         else if (matchAndRemove(tokenType.NEGATE) != null)
         {
@@ -457,7 +496,7 @@ public class Parser
         }
         else
         {
-            return null;
+            return matchAndRemoveBooleanComparison();
         }
     }
 
@@ -470,7 +509,7 @@ public class Parser
     private ASTNode term() throws SyntaxErrorException
     {
         ASTNode leftOperand = factor();
-        operationType opType = handleTermOperator();
+        tokenType opType = handleTermOperator();
         ASTNode rightOperand = factor();
 
         if (leftOperand == null)
@@ -496,19 +535,19 @@ public class Parser
      *
      * @return operationType on the term priority or null if no such operator is found.
      */
-    private operationType handleTermOperator() throws SyntaxErrorException
+    private tokenType handleTermOperator() throws SyntaxErrorException
     {
         if (matchAndRemove(tokenType.MULT) != null)
         {
-            return operationType.MULT;
+            return tokenType.MULT;
         }
         else if (matchAndRemove(tokenType.DIV) != null)
         {
-            return operationType.DIV;
+            return tokenType.DIV;
         }
         else if (matchAndRemove(tokenType.MOD) != null)
         {
-            return operationType.MOD;
+            return tokenType.MOD;
         }
         else if (matchAndRemove(tokenType.NEGATE) != null)
         {
@@ -555,6 +594,12 @@ public class Parser
         else return null;
     }
 
+    /**
+     * Creates and returns a VariableReferenceNode with an optional array expression and following bracket removal.
+     *
+     * @return VariableReferenceNode with a name and optional array expression.
+     * @throws SyntaxErrorException If no RBRACK Token is removed after an LBRACK Token is found.
+     */
     private VariableReferenceNode handleVariableReferenceNode() throws SyntaxErrorException
     {
         String referenceName = matchAndRemoveAndGetValueAndTestForException();
@@ -569,22 +614,6 @@ public class Parser
         }
 
         return new VariableReferenceNode(arrayExpression, referenceName, lineNumber);
-    }
-
-    private ASTNode booleanCompare() throws SyntaxErrorException
-    {
-        ASTNode leftComparand = expression();
-
-        if (isLineEmpty())
-        {
-            return leftComparand;
-        }
-
-        tokenType compType = matchAndRemoveBooleanComparison(); //TODO: see if we can use function composition here?
-
-        ASTNode rightComparand = expression();
-
-        return new BooleanCompareNode(leftComparand, compType, rightComparand, lineNumber);
     }
 
     /**
@@ -683,6 +712,13 @@ public class Parser
         }
     }
 
+    /**
+     * Checks and returns if the current Token is of type EOL.
+     * Since the list of Tokens is not ordered in terms of lines, each EOL Token must designate this.
+     * Therefore, in this model, this is the last token in an empty line.
+     *
+     * @return If the current Token is of type EOL.
+     */
     private boolean isLineEmpty()
     {
         return peek(0).getType() == tokenType.EOL;

@@ -4,6 +4,8 @@
 
 package ParserTools.Nodes;
 
+import CrossStageTools.tokenType;
+
 public class MathOpNode extends ASTNode
 {
     public enum operationType {ADD, SUB, MULT, DIV, MOD}
@@ -15,19 +17,19 @@ public class MathOpNode extends ASTNode
 
     /**
      * Constructs a MathOpNode with the former incoming ASTNode as its left operand,
-     * the incoming operationType as its operation type, the latter incoming ASTNode as its right operand,
+     * the incoming tokenType as its operation type, the latter incoming ASTNode as its right operand,
      * and the incoming int as its line number.
      *
      * @param incomingLeftOperand Former incoming ASTNode.
-     * @param incomingOpType Incoming operationType.
+     * @param incomingTokenType Incoming tokenType.
      * @param incomingRightOperand Latter incoming ASTNode.
      * @param line Incoming int.
      */
-    public MathOpNode(ASTNode incomingLeftOperand, operationType incomingOpType, ASTNode incomingRightOperand,
+    public MathOpNode(ASTNode incomingLeftOperand, tokenType incomingTokenType, ASTNode incomingRightOperand,
                       int line)
     {
         leftOperand = incomingLeftOperand;
-        opType = incomingOpType;
+        opType = tokenTypeToOperationType(incomingTokenType);
         rightOperand = incomingRightOperand;
         lineNumber = line;
     }
@@ -70,14 +72,33 @@ public class MathOpNode extends ASTNode
      */
     public String opTypeToString(operationType incomingType)
     {
-        switch(incomingType)
+        switch (incomingType)
         {
-            case ADD :  return "+";
-            case SUB :  return "-";
+            case ADD  : return "+";
+            case SUB  : return "-";
             case MULT : return "*";
             case DIV  : return "/";
             case MOD  : return "%";
             default   : return "No valid opType detected.";
+        }
+    }
+
+    /**
+     * Translates and returns the incoming tokenType to an equivalent operationType.
+     *
+     * @param tType Incoming tokenType.
+     * @return Equivalent operationType.
+     */
+    private operationType tokenTypeToOperationType(tokenType tType)
+    {
+        switch (tType)
+        {
+            case ADD   : return operationType.ADD;
+            case MINUS : return operationType.SUB;
+            case MULT  : return operationType.MULT;
+            case DIV   : return operationType.DIV;
+            case MOD   : return operationType.MOD;
+            default    : return null;
         }
     }
 

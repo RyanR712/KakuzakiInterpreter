@@ -58,10 +58,33 @@ public class BooleanCompareNode extends ASTNode
         }
     }
 
+    /**
+     * Converts the incoming comparisonType to a semantically equivalent readable String.
+     *
+     * @param incomingType Incoming comparisonType.
+     * @return Equivalent readable String.
+     */
+    private String comparisonTypeToString(comparisonType incomingType)
+    {
+        switch (incomingType)
+        {
+            case GTHAN  : return ">";
+            case LTHAN  : return "<";
+            case GETO   : return ">=";
+            case LETO   : return "<=";
+            case EQUAL  : return "==";
+            case NEQUAL : return "!=";
+            case NOT    : return "not";
+            case AND    : return "&&";
+            case OR     : return "||";
+            default     : return "No valid String equivalent found in BooleanCompareNode's comparisonTypeToString().";
+        }
+    }
+
     @Override
     public String toString()
     {
-        return null;
+        return "(" + leftComparand + " " + comparisonTypeToString(compType) + " " + rightComparand + ")";
     }
 
     @Override

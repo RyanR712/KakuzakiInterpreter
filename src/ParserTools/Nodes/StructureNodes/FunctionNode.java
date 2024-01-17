@@ -76,7 +76,7 @@ public class FunctionNode extends ASTNode
         {
             if (i == 0)
             {
-                functionString += "\nWith statements:\n\t";
+                functionString += "\nWith statements:\n";
             }
 
             functionString += "\t" + statementList.get(i) + ",\n";

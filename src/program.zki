@@ -1,4 +1,6 @@
-define hello(testInt: integer)
+define hello()
+variables testInt : integer from 0 to 10
+
 
     read 1, 2, var three, var seven7777777
     write 4, 5, var six

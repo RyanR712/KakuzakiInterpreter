@@ -8,7 +8,7 @@ public class StringNode extends DataTypeNode
 {
     private String data;
 
-    private int lineNumber;
+    private int lowerRange, higherRange, lineNumber;
 
     /**
      * Constructs a String ASTNode with the incoming String as its data with the incoming int as its line number.

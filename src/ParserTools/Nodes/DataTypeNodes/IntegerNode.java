@@ -8,7 +8,7 @@ public class IntegerNode extends DataTypeNode
 {
     private int data;
 
-    private int lineNumber;
+    private int lineNumber, lowerRange, higherRange;
 
     /**
      * Constructs an Integer ASTNode with the former incoming int as its data

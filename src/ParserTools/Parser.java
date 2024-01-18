@@ -17,8 +17,7 @@ import CrossStageTools.Token;
 import CrossStageTools.tokenType;
 import Exceptions.SyntaxErrorException;
 import ParserTools.Nodes.ASTNode;
-import ParserTools.Nodes.DataTypeNodes.IntegerNode;
-import ParserTools.Nodes.DataTypeNodes.RealNode;
+import ParserTools.Nodes.DataTypeNodes.*;
 import ParserTools.Nodes.MathOpNode;
 import ParserTools.Nodes.StructureNodes.*;
 import ParserTools.Nodes.StructureNodes.LoopNodes.*;
@@ -26,8 +25,8 @@ import ParserTools.Nodes.StructureNodes.StatementNodes.*;
 
 public class Parser
 {
-    private ArrayList<Token> tokenList;
-    private ArrayList<ASTNode> nodeList;
+    private final ArrayList<Token> tokenList;
+    private final ArrayList<ASTNode> nodeList;
 
     private ProgramNode program;
 
@@ -243,9 +242,38 @@ public class Parser
 
         dataType = matchAndRemoveAndGetDataTypeAndTestForException();
 
+        boolean hasRange = false;
+
+        ASTNode lowerRange = null, higherRange = null;
+
+        if (dataType == tokenType.INTEGER || dataType == tokenType.REAL || dataType == tokenType.STRING)
+        {
+            if (matchAndRemove(tokenType.FROM) != null)
+            {
+                hasRange = true;
+
+                lowerRange = expression();
+
+                matchAndRemoveAndTestForException(tokenType.TO, "Expected TO Token after FROM Token");
+
+                higherRange = expression();
+            }
+        }
+
+        VariableNode currentVariable;
+
         for (int i = 0; i < variables.size(); i++)
         {
-            variables.get(i).setType(dataType);
+            currentVariable = variables.get(i);
+
+            currentVariable.setType(dataType);
+
+            if (hasRange)
+            {
+                currentVariable.setRangedAsTrue();
+                currentVariable.setLowerRange(lowerRange);
+                currentVariable.setHigherRange(higherRange);
+            }
         }
 
         expectOneOrMoreEOLs();
@@ -327,6 +355,15 @@ public class Parser
         return null;
     }
 
+    /**
+     * Creates and returns one IfNode with a conditional, a list of statements
+     * and a potential ELSIF/ELSE chain based on the incoming boolean,
+     * which determines if this particular call is in a chained IF statement already.
+     *
+     * @param isChained Incoming boolean.
+     * @return IfNode with the above items.
+     * @throws SyntaxErrorException If the IF, ELSIF and ELSE Tokens are not ordered appropriately.
+     */
     private IfNode handleIf(boolean isChained) throws SyntaxErrorException
     {
         int statedLineNumber = lineNumber;
@@ -358,6 +395,12 @@ public class Parser
         return new IfNode(handleStatements(), statedLineNumber);
     }
 
+    /**
+     * Creates and returns a WhileNode with a conditional statement and a list of statements.
+     *
+     * @return WhileNode with above items.
+     * @throws SyntaxErrorException If a WHILE Token is not found.
+     */
     private WhileNode handleWhile() throws SyntaxErrorException
     {
         int statedLineNumber = lineNumber;
@@ -373,6 +416,12 @@ public class Parser
         return new WhileNode(conditional, statements, statedLineNumber);
     }
 
+    /**
+     * Creates and returns a RepeatNode with a conditional statement and a list of statements.
+     *
+     * @return RepeatNode with above items.
+     * @throws SyntaxErrorException If a REPEAT Token and then an UNTIL Token are not found in that order.
+     */
     private RepeatNode handleRepeat() throws SyntaxErrorException
     {
         int statedLineNumber = lineNumber;
@@ -390,6 +439,13 @@ public class Parser
         return new RepeatNode(conditional, statements, statedLineNumber);
     }
 
+    /**
+     * Creates and returns a ForNode with an iterator variable, a lower bound on that iterator,
+     * an upper bound on that iterator and a list of statements.
+     *
+     * @return ForNode with above items.
+     * @throws SyntaxErrorException If a FOR Token, a FROM Token, and a TO Token are not found in that order.
+     */
     private ForNode handleFor() throws SyntaxErrorException
     {
         int statedLineNumber = lineNumber;
@@ -413,6 +469,12 @@ public class Parser
         return new ForNode(iterator, fromNode, toNode, statements, lineNumber);
     }
 
+    /**
+     * Creates and returns a FunctionCallNode with a String identifier and a list of arguments.
+     *
+     * @return FunctionCallNode with above items.
+     * @throws SyntaxErrorException If a COMMA Token does not separate each argument in a list of arguments.
+     */
     private FunctionCallNode handleFunctionCall() throws SyntaxErrorException
     {
         String calledName = matchAndRemoveAndGetValueAndTestForException();
@@ -435,6 +497,12 @@ public class Parser
         return new FunctionCallNode(calledName, arguments, lineNumber);
     }
 
+    /**
+     * Creates and returns one ArgumentNode, either variable or constant, used in a FunctionCallNode.
+     *
+     * @return Either variable or constant ArgumentNode.
+     * @throws SyntaxErrorException If a VAR Token was found but no following VariableReferenceNode.
+     */
     private ArgumentNode handleArgument() throws SyntaxErrorException
     {
         if (matchAndRemove(tokenType.VAR) != null)
@@ -484,7 +552,7 @@ public class Parser
     {
         if (matchAndRemove(type) == null)
         {
-            throw new SyntaxErrorException(message + ", but found " + peek(0) + ".");
+            throw new SyntaxErrorException(message + ", but found " + peek(0) + " on line " + lineNumber + ".");
         }
     }
 
@@ -843,7 +911,11 @@ public class Parser
         expectZeroOrMoreEOLs();
     }
 
-    private void expectZeroOrMoreEOLs() throws SyntaxErrorException
+    /**
+     * Matches and removes zero or more EOL Tokens.
+     * Used where there could be optional whitespace.
+     */
+    private void expectZeroOrMoreEOLs()
     {
         while (!tokenList.isEmpty() && matchAndRemove(tokenType.EOL) != null)
         {

@@ -9,13 +9,15 @@ import ParserTools.Nodes.ASTNode;
 
 public class VariableNode extends ASTNode
 {
+    private ASTNode lowerRange, higherRange;
+
     private String name, value;
 
     private tokenType type;
 
     private int lineNumber;
 
-    private boolean isChangeable;
+    private boolean isChangeable, isRanged;
 
     //TODO: try to receive the type and line number from a Token object?
     /**
@@ -34,6 +36,8 @@ public class VariableNode extends ASTNode
         type = incomingType;
         lineNumber = incomingLineNumber;
         isChangeable = changeable;
+        isRanged = incomingType == tokenType.INTEGER || incomingType == tokenType.STRING ||
+                   incomingType == tokenType.REAL;
     }
 
     //TODO: try to receive the type and value and line number from a Token object?
@@ -56,6 +60,18 @@ public class VariableNode extends ASTNode
         value = incomingValue;
         lineNumber = incomingLineNumber;
         isChangeable = changeable;
+        isRanged = incomingType == tokenType.INTEGER || incomingType == tokenType.STRING ||
+                   incomingType == tokenType.REAL;
+    }
+
+    /**
+     * Returns this VariableNode's tokenType.
+     *
+     * @return This VariableNode's tokenType.
+     */
+    public tokenType getType()
+    {
+        return type;
     }
 
     /**
@@ -78,6 +94,44 @@ public class VariableNode extends ASTNode
         value = incomingValue;
     }
 
+    public ASTNode getHigherRange()
+    {
+        return higherRange;
+    }
+
+    public ASTNode getLowerRange()
+    {
+        return lowerRange;
+    }
+
+    public void setLowerRange(ASTNode lower)
+    {
+        lowerRange = lower;
+    }
+
+    public void setHigherRange(ASTNode higher)
+    {
+        higherRange = higher;
+    }
+
+    /**
+     * Checks and returns if this VariableNode is ranged.
+     *
+     * @return True if this VariableNode is ranged.
+     */
+    public boolean isRanged()
+    {
+        return isRanged;
+    }
+
+    /**
+     * Sets isRanged to true.
+     */
+    public void setRangedAsTrue()
+    {
+        isRanged = true;
+    }
+
     @Override
     public String toString()
     {
@@ -88,6 +142,8 @@ public class VariableNode extends ASTNode
         variableString += name + " of type " + type + " on line " + lineNumber;
 
         variableString += value == null ? " with no value assigned" : " with value " + value;
+
+        variableString += isRanged ? " from " + lowerRange + " to " + higherRange : " with no range ";
 
         return variableString;
     }

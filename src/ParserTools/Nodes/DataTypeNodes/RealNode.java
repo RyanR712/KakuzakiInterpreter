@@ -6,7 +6,7 @@ package ParserTools.Nodes.DataTypeNodes;
 
 public class RealNode extends DataTypeNode
 {
-    private float data;
+    private float data, lowerRange, higherRange;
 
     private int lineNumber;
 

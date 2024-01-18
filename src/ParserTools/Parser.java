@@ -2,6 +2,8 @@
  * Parses an ArrayList of Tokens into a series of Nodes in an abstract syntax tree.
  */
 
+//TODO: Extract line numbers in structure constructors from the comparison?
+
 package ParserTools;
 
 import java.io.File;
@@ -157,7 +159,7 @@ public class Parser
     private ArrayList<VariableNode> handleParameters() throws SyntaxErrorException
     {
         matchAndRemoveAndTestForException(tokenType.LPAREN,
-                "Left parenthesis in function definition expected on line " + lineNumber + ".");
+                "Left parenthesis in function definition expected on line " + lineNumber);
 
         ArrayList<VariableNode> parameters = new ArrayList<>();
 
@@ -167,7 +169,7 @@ public class Parser
         }
 
         matchAndRemoveAndTestForException(tokenType.RPAREN,
-                "Right parenthesis in function definition expected on line " + lineNumber + ".");
+                "Right parenthesis in function definition expected on line " + lineNumber);
 
         expectOneOrMoreEOLs();
 
@@ -185,13 +187,13 @@ public class Parser
         String name = matchAndRemove(tokenType.IDENTIFIER).getValue();
 
         matchAndRemoveAndTestForException(tokenType.COLON,
-                "Expected COLON Token between parameter identifier and type declaration on line " + lineNumber + ".");
+                "Expected COLON Token between parameter identifier and type declaration on line " + lineNumber);
 
         tokenType variableType = matchAndRemoveAndGetDataTypeAndTestForException();
 
         if (peek(0).getType() == tokenType.SEMICOLON && peek(1).getType() != tokenType.IDENTIFIER)
         {
-            throw new SyntaxErrorException("Expected IDENTIFIER Token after SEMICOLON Token on " + lineNumber + ".");
+            throw new SyntaxErrorException("Expected IDENTIFIER Token after SEMICOLON Token on " + lineNumber);
         } else
         {
             matchAndRemove(tokenType.SEMICOLON);
@@ -207,7 +209,7 @@ public class Parser
      */
     private ArrayList<VariableNode> handleConstants() throws SyntaxErrorException
     {
-        matchAndRemoveAndTestForException(tokenType.CONSTANTS, "Expected CONSTANTS Token on line " + lineNumber + ".");
+        matchAndRemoveAndTestForException(tokenType.CONSTANTS, "Expected CONSTANTS Token on line " + lineNumber);
 
         ArrayList<VariableNode> constants = new ArrayList<>();
 
@@ -220,7 +222,7 @@ public class Parser
         constants.add(handleConstantOrVariable(false));
 
         matchAndRemoveAndTestForException(tokenType.EQUAL,
-                "Expected EQUAL Token after IDENTIFIER on line " + lineNumber + ".");
+                "Expected EQUAL Token after IDENTIFIER on line " + lineNumber);
 
         int negationMultiplier = matchAndRemoveNegation();
         String valueString = determineAndCreateNumberNode(negationMultiplier).toString();
@@ -244,7 +246,7 @@ public class Parser
      */
     private ArrayList<VariableNode> handleVariables() throws SyntaxErrorException
     {
-        matchAndRemoveAndTestForException(tokenType.VARIABLES, "Expected VARIABLES Token on line " + lineNumber + ".");
+        matchAndRemoveAndTestForException(tokenType.VARIABLES, "Expected VARIABLES Token on line " + lineNumber);
 
         ArrayList<VariableNode> variables = new ArrayList<>();
 
@@ -259,7 +261,7 @@ public class Parser
         variables.add(handleConstantOrVariable(true));
 
         matchAndRemoveAndTestForException(tokenType.COLON,
-                "Expected COLON after all variables on line " + lineNumber + ".");
+                "Expected COLON after all variables on line " + lineNumber);
 
         dataType = matchAndRemoveAndGetDataTypeAndTestForException();
 
@@ -294,7 +296,7 @@ public class Parser
      */
     private ArrayList<StatementNode> handleStatements() throws SyntaxErrorException
     {
-        matchAndRemoveAndTestForException(tokenType.INDENT, "Indent expected on line " + lineNumber + ".");
+        matchAndRemoveAndTestForException(tokenType.INDENT, "Indent expected on line " + lineNumber);
 
         ArrayList<StatementNode> statements = new ArrayList<>();
 
@@ -303,7 +305,7 @@ public class Parser
             statements.add(handleStatement());
         }
 
-        matchAndRemoveAndTestForException(tokenType.DEDENT, "Dedent expected on line " + lineNumber + ".");
+        matchAndRemoveAndTestForException(tokenType.DEDENT, "Dedent expected on line " + lineNumber);
 
         return statements;
     }
@@ -352,13 +354,13 @@ public class Parser
 
         if (matchAndRemove(tokenType.ELSE) == null)
         {
-            if (isChained)
+            if (!isChained)
             {
-                matchAndRemoveAndTestForException(tokenType.IF, "Expected IF Token on line " + statedLineNumber + ".");
+                matchAndRemoveAndTestForException(tokenType.IF, "Expected IF Token on line " + statedLineNumber);
             }
             else
             {
-                matchAndRemoveAndTestForException(tokenType.ELSIF, "Expected ELSIF Token on line " + statedLineNumber + ".");
+                matchAndRemoveAndTestForException(tokenType.ELSIF, "Expected ELSIF Token on line " + statedLineNumber);
             }
 
             BooleanCompareNode conditional = (BooleanCompareNode)booleanCompare();
@@ -367,8 +369,12 @@ public class Parser
 
             ArrayList<StatementNode> statements = handleStatements();
 
-            return new IfNode(conditional, statements, (peekAndGetType(0) == tokenType.ELSIF ? handleIf(true) : null), statedLineNumber);
+            return new IfNode(conditional, statements,
+                    (peekAndGetType(0) == tokenType.ELSIF || peekAndGetType(0) == tokenType.ELSE
+                            ? handleIf(true) : null), statedLineNumber);
         }
+
+        expectOneOrMoreEOLs();
 
         return new IfNode(handleStatements(), statedLineNumber);
     }
@@ -377,7 +383,7 @@ public class Parser
     {
         int statedLineNumber = lineNumber;
 
-        matchAndRemoveAndTestForException(tokenType.WHILE, "Expected WHILE Token on line " + statedLineNumber + ".");
+        matchAndRemoveAndTestForException(tokenType.WHILE, "Expected WHILE Token on line " + statedLineNumber);
 
         BooleanCompareNode conditional = (BooleanCompareNode)booleanCompare();
 
@@ -392,9 +398,9 @@ public class Parser
     {
         int statedLineNumber = lineNumber;
 
-        matchAndRemoveAndTestForException(tokenType.REPEAT, "Expected REPEAT Token on line " + statedLineNumber + ".");
+        matchAndRemoveAndTestForException(tokenType.REPEAT, "Expected REPEAT Token on line " + statedLineNumber);
 
-        matchAndRemoveAndTestForException(tokenType.UNTIL, "Expected UNTIL Token on line " + statedLineNumber +".");
+        matchAndRemoveAndTestForException(tokenType.UNTIL, "Expected UNTIL Token on line " + statedLineNumber);
 
         BooleanCompareNode conditional = (BooleanCompareNode)booleanCompare();
 
@@ -409,15 +415,15 @@ public class Parser
     {
         int statedLineNumber = lineNumber;
 
-        matchAndRemoveAndTestForException(tokenType.FOR, "Expected FOR Token on line " + statedLineNumber + ".");
+        matchAndRemoveAndTestForException(tokenType.FOR, "Expected FOR Token on line " + statedLineNumber);
 
         VariableReferenceNode iterator = handleVariableReferenceNode(); //TODO: this means you could put an array here
 
-        matchAndRemoveAndTestForException(tokenType.FROM, "Expected FROM Token on line " + statedLineNumber + ".");
+        matchAndRemoveAndTestForException(tokenType.FROM, "Expected FROM Token on line " + statedLineNumber);
 
         ASTNode fromNode = expression();
 
-        matchAndRemoveAndTestForException(tokenType.TO, "Expected TO Token on line " + statedLineNumber + ".");
+        matchAndRemoveAndTestForException(tokenType.TO, "Expected TO Token on line " + statedLineNumber);
 
         ASTNode toNode = expression();
 
@@ -441,7 +447,7 @@ public class Parser
             if (peekAndGetType(1) != tokenType.EOL)
             {
                 matchAndRemoveAndTestForException(tokenType.COMMA,
-                        "COMMA Token expected for multiple arguments on line " + lineNumber + ".");
+                        "COMMA Token expected for multiple arguments on line " + lineNumber);
             }
         }
 
@@ -471,7 +477,7 @@ public class Parser
         VariableReferenceNode referencedNode = handleVariableReferenceNode();
 
         matchAndRemoveAndTestForException(tokenType.ASSIGN, "ASSIGN Token expected after variable reference on line " +
-                                            lineNumber + ".");
+                                            lineNumber);
 
         ASTNode assignmentValue = booleanCompare();
 
@@ -492,7 +498,7 @@ public class Parser
     {
         if (matchAndRemove(type) == null)
         {
-            throw new SyntaxErrorException(message + " but found " + peek(0));
+            throw new SyntaxErrorException(message + ", but found " + peek(0) + ".");
         }
     }
 
@@ -527,7 +533,7 @@ public class Parser
 
         if ((dataType = matchAndRemoveDataTypeToken()) == null)
         {
-            throw new SyntaxErrorException("Expected data type tokenType on line " + lineNumber + ".");
+            throw new SyntaxErrorException("Expected data type tokenType on line " + lineNumber);
         }
 
         return dataType;
@@ -717,8 +723,7 @@ public class Parser
             if (matchAndRemove(tokenType.RPAREN) == null)
             {
                 throw new SyntaxErrorException("Unenclosed parenthesized expression while parsing on line "
-                                                + lineNumber + "."
-                                                );
+                                                + lineNumber);
             }
 
             return parenthesizedExpressionNode;
@@ -753,7 +758,7 @@ public class Parser
         {
             arrayExpression = expression();
             matchAndRemoveAndTestForException(tokenType.RBRACK,
-                                "Expected RBRACK Token after array indexing on line " + lineNumber + ".");
+                                "Expected RBRACK Token after array indexing on line " + lineNumber);
         }
 
         return new VariableReferenceNode(arrayExpression, referenceName, lineNumber);
@@ -847,7 +852,7 @@ public class Parser
         if (peekAndGetType(0) != tokenType.EOL)
         {
             throw new SyntaxErrorException(
-                    "Expected EOL on line " + lineNumber + " but found " + peek(0).getType() + ".");
+                    "Expected EOL on line " + lineNumber + ", but found " + peek(0).getType() + ".");
         }
         while (!tokenList.isEmpty() && matchAndRemove(tokenType.EOL) != null)
         {

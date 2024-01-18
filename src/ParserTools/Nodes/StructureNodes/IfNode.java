@@ -53,7 +53,11 @@ public class IfNode extends StatementNode
      */
     public IfNode(ArrayList<StatementNode> incomingStatements, int line)
     {
+        conditional = null;
+
         statements = incomingStatements;
+
+        nextIf = null;
 
         lineNumber = line;
     }
@@ -93,7 +97,19 @@ public class IfNode extends StatementNode
     @Override
     public String toString()
     {
-        return null;
+        String ifString = (conditional != null ? "if(" + conditional : "else");
+
+        for (int i = 0; i < statements.size(); i++)
+        {
+            if (i == 0)
+            {
+                ifString += "\nWith statements:";
+            }
+
+            ifString += "\n" + statements.get(i) + ",";
+        }
+
+        return nextIf != null ? ifString + "\nels" + nextIf : ifString;
     }
 
     @Override

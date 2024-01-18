@@ -6,6 +6,8 @@ package CrossStageTools;
 
 public enum tokenType
 {
+    NONE,
+
     IDENTIFIER, NUMBER, EOL,
     INDENT, DEDENT,
     CHARLITERAL, STRINGLITERAL,

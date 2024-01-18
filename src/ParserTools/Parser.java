@@ -11,15 +11,15 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import ParserTools.Nodes.ASTNode;
 import CrossStageTools.Token;
 import CrossStageTools.tokenType;
 import Exceptions.SyntaxErrorException;
+import ParserTools.Nodes.ASTNode;
 import ParserTools.Nodes.DataTypeNodes.IntegerNode;
 import ParserTools.Nodes.DataTypeNodes.RealNode;
 import ParserTools.Nodes.MathOpNode;
-import ParserTools.Nodes.StructureNodes.FunctionNode;
-import ParserTools.Nodes.StructureNodes.ProgramNode;
+import ParserTools.Nodes.StructureNodes.*;
+import ParserTools.Nodes.StructureNodes.LoopNodes.*;
 import ParserTools.Nodes.StructureNodes.StatementNodes.*;
 
 public class Parser
@@ -132,7 +132,7 @@ public class Parser
 
         ArrayList<VariableNode> parameters, variables = new ArrayList<>();
 
-        String functionName = matchAndRemove(tokenType.IDENTIFIER).getValue();
+        String functionName = matchAndRemoveAndGetValueAndTestForException();
 
         int definitionLineNumber = lineNumber;
 
@@ -192,8 +192,7 @@ public class Parser
         if (peek(0).getType() == tokenType.SEMICOLON && peek(1).getType() != tokenType.IDENTIFIER)
         {
             throw new SyntaxErrorException("Expected IDENTIFIER Token after SEMICOLON Token on " + lineNumber + ".");
-        }
-        else
+        } else
         {
             matchAndRemove(tokenType.SEMICOLON);
             return new VariableNode(name, variableType, lineNumber, true);
@@ -221,7 +220,7 @@ public class Parser
         constants.add(handleConstantOrVariable(false));
 
         matchAndRemoveAndTestForException(tokenType.EQUAL,
-                                          "Expected EQUAL Token after IDENTIFIER on line " + lineNumber + ".");
+                "Expected EQUAL Token after IDENTIFIER on line " + lineNumber + ".");
 
         int negationMultiplier = matchAndRemoveNegation();
         String valueString = determineAndCreateNumberNode(negationMultiplier).toString();
@@ -260,7 +259,7 @@ public class Parser
         variables.add(handleConstantOrVariable(true));
 
         matchAndRemoveAndTestForException(tokenType.COLON,
-                                          "Expected COLON after all variables on line " + lineNumber + ".");
+                "Expected COLON after all variables on line " + lineNumber + ".");
 
         dataType = matchAndRemoveAndGetDataTypeAndTestForException();
 
@@ -302,7 +301,6 @@ public class Parser
         while (peek(0).getType() != tokenType.DEDENT)
         {
             statements.add(handleStatement());
-            expectOneOrMoreEOLs();
         }
 
         matchAndRemoveAndTestForException(tokenType.DEDENT, "Dedent expected on line " + lineNumber + ".");
@@ -318,7 +316,148 @@ public class Parser
      */
     private StatementNode handleStatement() throws SyntaxErrorException
     {
-        return handleAssignment();
+        if (peek(0).getType() == tokenType.IF)
+        {
+            return handleIf(false);
+        }
+        else if (peek(0).getType() == tokenType.WHILE)
+        {
+            return handleWhile();
+        }
+        else if (peek(0).getType() == tokenType.REPEAT)
+        {
+            return handleRepeat();
+        }
+        else if (peek(0).getType() == tokenType.FOR)
+        {
+            return handleFor();
+        }
+        else if (peek(0).getType() == tokenType.IDENTIFIER)
+        {
+            if (peek(1).getType() == tokenType.ASSIGN)
+            {
+                return handleAssignment();
+            }
+            else
+            {
+                return handleFunctionCall();
+            }
+        }
+        return null;
+    }
+
+    private IfNode handleIf(boolean isChained) throws SyntaxErrorException
+    {
+        int statedLineNumber = lineNumber;
+
+        if (matchAndRemove(tokenType.ELSE) == null)
+        {
+            if (isChained)
+            {
+                matchAndRemoveAndTestForException(tokenType.IF, "Expected IF Token on line " + statedLineNumber + ".");
+            }
+            else
+            {
+                matchAndRemoveAndTestForException(tokenType.ELSIF, "Expected ELSIF Token on line " + statedLineNumber + ".");
+            }
+
+            BooleanCompareNode conditional = (BooleanCompareNode)booleanCompare();
+
+            expectOneOrMoreEOLs();
+
+            ArrayList<StatementNode> statements = handleStatements();
+
+            return new IfNode(conditional, statements, (peekAndGetType(0) == tokenType.ELSIF ? handleIf(true) : null), statedLineNumber);
+        }
+
+        return new IfNode(handleStatements(), statedLineNumber);
+    }
+
+    private WhileNode handleWhile() throws SyntaxErrorException
+    {
+        int statedLineNumber = lineNumber;
+
+        matchAndRemoveAndTestForException(tokenType.WHILE, "Expected WHILE Token on line " + statedLineNumber + ".");
+
+        BooleanCompareNode conditional = (BooleanCompareNode)booleanCompare();
+
+        expectOneOrMoreEOLs();
+
+        ArrayList<StatementNode> statements = handleStatements();
+
+        return new WhileNode(conditional, statements, statedLineNumber);
+    }
+
+    private RepeatNode handleRepeat() throws SyntaxErrorException
+    {
+        int statedLineNumber = lineNumber;
+
+        matchAndRemoveAndTestForException(tokenType.REPEAT, "Expected REPEAT Token on line " + statedLineNumber + ".");
+
+        matchAndRemoveAndTestForException(tokenType.UNTIL, "Expected UNTIL Token on line " + statedLineNumber +".");
+
+        BooleanCompareNode conditional = (BooleanCompareNode)booleanCompare();
+
+        expectOneOrMoreEOLs();
+
+        ArrayList<StatementNode> statements = handleStatements();
+
+        return new RepeatNode(conditional, statements, statedLineNumber);
+    }
+
+    private ForNode handleFor() throws SyntaxErrorException
+    {
+        int statedLineNumber = lineNumber;
+
+        matchAndRemoveAndTestForException(tokenType.FOR, "Expected FOR Token on line " + statedLineNumber + ".");
+
+        VariableReferenceNode iterator = handleVariableReferenceNode(); //TODO: this means you could put an array here
+
+        matchAndRemoveAndTestForException(tokenType.FROM, "Expected FROM Token on line " + statedLineNumber + ".");
+
+        ASTNode fromNode = expression();
+
+        matchAndRemoveAndTestForException(tokenType.TO, "Expected TO Token on line " + statedLineNumber + ".");
+
+        ASTNode toNode = expression();
+
+        expectOneOrMoreEOLs();
+
+        ArrayList<StatementNode> statements = handleStatements();
+
+        return new ForNode(iterator, fromNode, toNode, statements, lineNumber);
+    }
+
+    private FunctionCallNode handleFunctionCall() throws SyntaxErrorException
+    {
+        String calledName = matchAndRemoveAndGetValueAndTestForException();
+
+        ArrayList<ArgumentNode> arguments = new ArrayList<>();
+
+        while (!isLineEmpty())
+        {
+            arguments.add(handleArgument());
+
+            if (peekAndGetType(1) != tokenType.EOL)
+            {
+                matchAndRemoveAndTestForException(tokenType.COMMA,
+                        "COMMA Token expected for multiple arguments on line " + lineNumber + ".");
+            }
+        }
+
+        return new FunctionCallNode(calledName, arguments, lineNumber);
+    }
+
+    private ArgumentNode handleArgument() throws SyntaxErrorException
+    {
+        if (matchAndRemove(tokenType.VAR) != null)
+        {
+            return new ArgumentNode(handleVariableReferenceNode(), lineNumber);
+        }
+        else
+        {
+            return new ArgumentNode(booleanCompare(), lineNumber);
+        }
     }
 
     /**
@@ -334,7 +473,11 @@ public class Parser
         matchAndRemoveAndTestForException(tokenType.ASSIGN, "ASSIGN Token expected after variable reference on line " +
                                             lineNumber + ".");
 
-        return new AssignmentNode(referencedNode, booleanCompare(), lineNumber);
+        ASTNode assignmentValue = booleanCompare();
+
+        expectOneOrMoreEOLs();
+
+        return new AssignmentNode(referencedNode, assignmentValue, lineNumber);
     }
 
     /**
@@ -349,7 +492,7 @@ public class Parser
     {
         if (matchAndRemove(type) == null)
         {
-            throw new SyntaxErrorException(message);
+            throw new SyntaxErrorException(message + " but found " + peek(0));
         }
     }
 
@@ -446,7 +589,7 @@ public class Parser
         {
             return null;
         }
-        if (peek(0).getType() == tokenType.EOL)
+        if (peekAndGetType(0) == tokenType.EOL)
         {
             return leftOperand;
         }
@@ -520,7 +663,7 @@ public class Parser
         {
             return leftOperand;
         }
-        else if (peek(0).getType() == tokenType.MULT || peek(0).getType() == tokenType.DIV || peek(0).getType() == tokenType.MOD)
+        else if (peekAndGetType(0) == tokenType.MULT || peekAndGetType(0) == tokenType.DIV || peekAndGetType(0) == tokenType.MOD)
         {
             //fix this style when you are less tired please
             return new MathOpNode(new MathOpNode(leftOperand, opType, rightOperand, lineNumber), handleTermOperator(), term(), lineNumber);
@@ -583,11 +726,11 @@ public class Parser
 
         int negativeMultiplier = matchAndRemoveNegation();
 
-        if (peek(0).getType() == tokenType.NUMBER)
+        if (peekAndGetType(0) == tokenType.NUMBER)
         {
             return determineAndCreateNumberNode(negativeMultiplier);
         }
-        else if (peek(0).getType() == tokenType.IDENTIFIER)
+        else if (peekAndGetType(0) == tokenType.IDENTIFIER)
         {
             return handleVariableReferenceNode();
         }
@@ -701,7 +844,7 @@ public class Parser
      */
     private void expectOneOrMoreEOLs() throws SyntaxErrorException
     {
-        if (peek(0).getType() != tokenType.EOL)
+        if (peekAndGetType(0) != tokenType.EOL)
         {
             throw new SyntaxErrorException(
                     "Expected EOL on line " + lineNumber + " but found " + peek(0).getType() + ".");
@@ -721,7 +864,18 @@ public class Parser
      */
     private boolean isLineEmpty()
     {
-        return peek(0).getType() == tokenType.EOL;
+        return peekAndGetType(0) == tokenType.EOL;
+    }
+
+    /**
+     * Returns the tokenType at the incoming index.
+     *
+     * @param index Incoming index.
+     * @return tokenType at index.
+     */
+    private tokenType peekAndGetType(int index)
+    {
+        return peek(index).getType();
     }
 
     /**
@@ -732,6 +886,6 @@ public class Parser
      */
     private Token peek(int index)
     {
-        return !tokenList.isEmpty() ? tokenList.get(index) : null;
+        return !tokenList.isEmpty() ? tokenList.get(index) : new Token(tokenType.NONE, -1);
     }
 }

@@ -35,7 +35,19 @@ public class FunctionCallNode extends StatementNode
     @Override
     public String toString()
     {
-        return null;
+        String functionCallString = calledName + "(";
+
+        for (int i = 0; i < arguments.size(); i++)
+        {
+            if (i > 0)
+            {
+                functionCallString += " ";
+            }
+
+            functionCallString += arguments.get(i) + ",";
+        }
+
+        return functionCallString + ")";
     }
 
     @Override

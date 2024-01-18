@@ -51,7 +51,7 @@ public class ArgumentNode extends ASTNode
     @Override
     public String toString()
     {
-        return null;
+        return isConstant ? "const " + constantParam : "var " + variableParam;
     }
 
     @Override

@@ -1,30 +1,53 @@
 define hello(testInt: integer)
-    if i < 1
-        test := test
-    elsif i < 2
-        test := test + 1
-    elsif i < 3
-        test := 0
-    elsif i < 4
-        while i > 4
-            i := i - 1
+
+    read 1, 2, var three, var seven7777777
+    write 4, 5, var six
+
+    if i < 0
+        write var i
+    elsif i > 0
+        write var j
     else
-        test := ~1
+        write var k
+        while i < 100
+            while j < 10000
+                for k from 0 to 100000000
+                    write var k
+                j := j + 1
 
-        if i = 0
-            hello := goodbye
-            if i = 1
-                if i = 2
-                    if i = 3
-                        please := PLEASE
-        elsif i < 0
-            goodbye := hello
-        else
-            please := pretty
 
-    i := ~4
 
-define justMakingSure(testReal: real)
-variables constantce: integer
-constants varbiales = ~124
-    i := 0
+
+
+            i := i + 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        write var i
+
+
+
+    write ding
+
+
+define goodbye(testString: string ; testChar : character)
+variables yo : integer
+constants hi = ~40
+    hi := 12

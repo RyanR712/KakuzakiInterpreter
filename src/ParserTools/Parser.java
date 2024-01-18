@@ -29,6 +29,8 @@ public class Parser
     private ArrayList<Token> tokenList;
     private ArrayList<ASTNode> nodeList;
 
+    private ProgramNode program;
+
     private int lineNumber;
 
     /**
@@ -52,7 +54,7 @@ public class Parser
      */
     public ProgramNode parse() throws SyntaxErrorException
     {
-        ProgramNode program = new ProgramNode(new HashMap<>());
+        program = new ProgramNode(new HashMap<>());
         FunctionNode functionToAdd;
         while (!tokenList.isEmpty() && (functionToAdd = function()) != null)
         {
@@ -87,36 +89,10 @@ public class Parser
         {
             FileWriter fw = new FileWriter(file);
 
-            fw.write(formatNodes());
+            fw.write(program.toString());
 
             fw.close();
         }
-    }
-
-    /**
-     * Formats and returns this Parser's ASTNodes in a sensible manner.
-     *
-     * @return Formatted ASTNodes in one String.
-     */
-    private String formatNodes()
-    {
-        String dumpString = "";
-        boolean isLineNumberPrinted = false;
-
-        for (int i = 0; i < nodeList.size(); i++)
-        {
-            if (!isLineNumberPrinted)
-            {
-                dumpString += nodeList.get(i).getLineNumber() + "\t";
-                isLineNumberPrinted = true;
-            }
-            dumpString += nodeList.get(i) + " ";
-            if (nodeList.size() > 1 && nodeList.get(i).getLineNumber() < nodeList.get(i + 1).getLineNumber())
-            {
-                isLineNumberPrinted = false;
-            }
-        }
-        return dumpString;
     }
 
     /**
@@ -144,6 +120,8 @@ public class Parser
         {
             variables.addAll(peek(0).getType() == tokenType.CONSTANTS ? handleConstants() : handleVariables());
         }
+
+        expectZeroOrMoreEOLs();
 
         ArrayList<StatementNode> statements = handleStatements();
 
@@ -303,6 +281,7 @@ public class Parser
         while (peek(0).getType() != tokenType.DEDENT)
         {
             statements.add(handleStatement());
+            expectZeroOrMoreEOLs();
         }
 
         matchAndRemoveAndTestForException(tokenType.DEDENT, "Dedent expected on line " + lineNumber);
@@ -444,12 +423,14 @@ public class Parser
         {
             arguments.add(handleArgument());
 
-            if (peekAndGetType(1) != tokenType.EOL)
+            if (peekAndGetType(0) != tokenType.EOL)
             {
                 matchAndRemoveAndTestForException(tokenType.COMMA,
                         "COMMA Token expected for multiple arguments on line " + lineNumber);
             }
         }
+
+        expectOneOrMoreEOLs();
 
         return new FunctionCallNode(calledName, arguments, lineNumber);
     }
@@ -458,6 +439,11 @@ public class Parser
     {
         if (matchAndRemove(tokenType.VAR) != null)
         {
+            if (peekAndGetType(0) != tokenType.IDENTIFIER)
+            {
+                throw new SyntaxErrorException(
+                        "VAR Token found on line " + lineNumber + " but was followed by a constant.");
+            }
             return new ArgumentNode(handleVariableReferenceNode(), lineNumber);
         }
         else
@@ -569,7 +555,7 @@ public class Parser
     {
         ASTNode leftComparand = expression();
 
-        if (isLineEmpty())
+        if (isLineEmpty() || peekAndGetType(0) == tokenType.COMMA)
         {
             return leftComparand;
         }
@@ -854,6 +840,11 @@ public class Parser
             throw new SyntaxErrorException(
                     "Expected EOL on line " + lineNumber + ", but found " + peek(0).getType() + ".");
         }
+        expectZeroOrMoreEOLs();
+    }
+
+    private void expectZeroOrMoreEOLs() throws SyntaxErrorException
+    {
         while (!tokenList.isEmpty() && matchAndRemove(tokenType.EOL) != null)
         {
             lineNumber++;
@@ -892,5 +883,32 @@ public class Parser
     private Token peek(int index)
     {
         return !tokenList.isEmpty() ? tokenList.get(index) : new Token(tokenType.NONE, -1);
+    }
+
+    /**
+     * Formats and returns this Parser's ASTNodes in a sensible manner.
+     *
+     * @return Formatted ASTNodes in one String.
+     * @deprecated As Parser.java is no longer based on an ASTNode ArrayList.
+     */
+    private String formatNodes()
+    {
+        String dumpString = "";
+        boolean isLineNumberPrinted = false;
+
+        for (int i = 0; i < nodeList.size(); i++)
+        {
+            if (!isLineNumberPrinted)
+            {
+                dumpString += nodeList.get(i).getLineNumber() + "\t";
+                isLineNumberPrinted = true;
+            }
+            dumpString += nodeList.get(i) + " ";
+            if (nodeList.size() > 1 && nodeList.get(i).getLineNumber() < nodeList.get(i + 1).getLineNumber())
+            {
+                isLineNumberPrinted = false;
+            }
+        }
+        return dumpString;
     }
 }

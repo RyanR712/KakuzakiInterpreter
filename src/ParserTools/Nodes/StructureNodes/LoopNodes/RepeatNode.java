@@ -7,7 +7,7 @@ package ParserTools.Nodes.StructureNodes.LoopNodes;
 import java.util.ArrayList;
 
 import ParserTools.Nodes.StructureNodes.StatementNodes.BooleanCompareNode;
-import ParserTools.Nodes.StructureNodes.StatementNodes.StatementNode;
+import CrossStageTools.CrossStageNodes.StatementNode;
 
 public class RepeatNode extends StatementNode
 {

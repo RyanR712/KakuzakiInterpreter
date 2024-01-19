@@ -13,10 +13,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import CrossStageTools.Token;
-import CrossStageTools.tokenType;
+import CrossStageTools.*;
+import CrossStageTools.CrossStageNodes.*;
 import Exceptions.SyntaxErrorException;
-import ParserTools.Nodes.ASTNode;
 import ParserTools.Nodes.DataTypeNodes.*;
 import ParserTools.Nodes.MathOpNode;
 import ParserTools.Nodes.StructureNodes.*;
@@ -80,6 +79,7 @@ public class Parser
      */
     public void writeDebugOutput() throws IOException
     {
+        //TODO: Write a boolean for "debug mode" in here because the program only gets updated on a per-function basis
         ZonedDateTime zdt = ZonedDateTime.now();
         String formattedOutput = zdt.getDayOfMonth() + "-" + zdt.getMonthValue() + "-" + zdt.getYear() + "@" +
                 zdt.getHour() + "_" + zdt.getMinute() + "_" + zdt.getSecond();

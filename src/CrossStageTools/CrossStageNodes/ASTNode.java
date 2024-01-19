@@ -2,7 +2,7 @@
  * Describes a Node in the AST.
  */
 
-package ParserTools.Nodes;
+package CrossStageTools.CrossStageNodes;
 
 public abstract class ASTNode
 {

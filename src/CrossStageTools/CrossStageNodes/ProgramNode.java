@@ -2,11 +2,12 @@
  * Describes one Kakuzaki program.
  */
 
-package ParserTools.Nodes.StructureNodes;
+package CrossStageTools.CrossStageNodes;
 
 import java.util.HashMap;
 
-import ParserTools.Nodes.ASTNode;
+import CrossStageTools.CrossStageNodes.ASTNode;
+import CrossStageTools.CrossStageNodes.FunctionNode;
 
 public class ProgramNode extends ASTNode
 {
@@ -30,6 +31,16 @@ public class ProgramNode extends ASTNode
     public void addFunction(FunctionNode incomingFunction)
     {
         functionMap.put(incomingFunction.getName(), incomingFunction);
+    }
+
+    /**
+     * Adds all the K/V pairs from the incoming HashMap into this ProgramNode's function map.
+     *
+     * @param addendumMap Incoming HashMap.
+     */
+    public void addMap(HashMap<String, FunctionNode> addendumMap)
+    {
+        functionMap.putAll(addendumMap);
     }
 
     @Override

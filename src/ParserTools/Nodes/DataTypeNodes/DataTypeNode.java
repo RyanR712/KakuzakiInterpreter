@@ -4,7 +4,7 @@
 
 package ParserTools.Nodes.DataTypeNodes;
 
-import ParserTools.Nodes.ASTNode;
+import CrossStageTools.CrossStageNodes.ASTNode;
 
 public abstract class DataTypeNode extends ASTNode
 {}

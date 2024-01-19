@@ -4,7 +4,8 @@
 
 package ParserTools.Nodes.StructureNodes.StatementNodes;
 
-import ParserTools.Nodes.ASTNode;
+import CrossStageTools.CrossStageNodes.ASTNode;
+import CrossStageTools.CrossStageNodes.StatementNode;
 
 public class AssignmentNode extends StatementNode
 {

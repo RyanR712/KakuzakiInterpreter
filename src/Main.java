@@ -9,14 +9,20 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 
+import CrossStageTools.CrossStageNodes.FunctionNode;
 import CrossStageTools.Token;
+import InterpreterTools.BuiltInFunctions.Arrays.*;
+import InterpreterTools.BuiltInFunctions.IO.*;
+import InterpreterTools.BuiltInFunctions.Numbers.*;
+import InterpreterTools.BuiltInFunctions.Strings.*;
 import LexerTools.Lexer;
-import ParserTools.Nodes.StructureNodes.ProgramNode;
+import CrossStageTools.CrossStageNodes.ProgramNode;
 import ParserTools.Parser;
 
 public class Main
@@ -76,7 +82,36 @@ public class Main
                 throw new Exception("Parsing failed.");
             }
 
+            program.addMap(loadBuiltInFunctions());
+
             System.out.println(program);
         }
+    }
+
+    /**
+     * Returns a HashMap with all builtin functions.
+     *
+     * @return HashMap with all builtin functions.
+     */
+    private static HashMap<String, FunctionNode> loadBuiltInFunctions()
+    {
+        HashMap<String, FunctionNode> builtInMap = new HashMap<>();
+
+        builtInMap.put("first", new First());
+        builtInMap.put("last", new Last());
+
+        builtInMap.put("read", new Read());
+        builtInMap.put("write", new Write());
+
+        builtInMap.put("getRandom", new GetRandom());
+        builtInMap.put("integerToReal", new IntegerToReal());
+        builtInMap.put("realToInteger", new RealToInteger());
+        builtInMap.put("squareRoot", new SquareRoot());
+
+        builtInMap.put("chopLeft", new ChopLeft());
+        builtInMap.put("chopRight", new ChopRight());
+        builtInMap.put("substring", new Substring());
+
+        return builtInMap;
     }
 }

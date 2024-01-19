@@ -95,7 +95,7 @@ public class LexerTest
      */
     private ArrayList<String> attemptToRead(String filename)
     {
-        Path path = Paths.get("testPrograms/" + filename);
+        Path path = Paths.get("TestPrograms/LexerPrograms/" + filename);
 
         ArrayList<String> lines = new ArrayList<>();
         try

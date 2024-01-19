@@ -6,8 +6,8 @@ package ParserTools.Nodes.StructureNodes.LoopNodes;
 
 import java.util.ArrayList;
 
-import ParserTools.Nodes.ASTNode;
-import ParserTools.Nodes.StructureNodes.StatementNodes.StatementNode;
+import CrossStageTools.CrossStageNodes.ASTNode;
+import CrossStageTools.CrossStageNodes.StatementNode;
 import ParserTools.Nodes.StructureNodes.StatementNodes.VariableReferenceNode;
 
 public class ForNode extends StatementNode

@@ -1,5 +1,5 @@
 define hello()
-variables testInt : integer from 0 to 10
+variables testInt, testInt2, testInt3 : real from 0.9 to ~10
 
 
     read 1, 2, var three, var seven7777777

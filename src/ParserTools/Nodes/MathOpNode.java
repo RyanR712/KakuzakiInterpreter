@@ -4,6 +4,7 @@
 
 package ParserTools.Nodes;
 
+import CrossStageTools.CrossStageNodes.ASTNode;
 import CrossStageTools.tokenType;
 
 public class MathOpNode extends ASTNode

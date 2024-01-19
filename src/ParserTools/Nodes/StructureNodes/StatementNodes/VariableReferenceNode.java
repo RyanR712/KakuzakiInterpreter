@@ -4,7 +4,7 @@
 
 package ParserTools.Nodes.StructureNodes.StatementNodes;
 
-import ParserTools.Nodes.ASTNode;
+import CrossStageTools.CrossStageNodes.ASTNode;
 
 public class VariableReferenceNode extends ASTNode
 {

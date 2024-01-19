@@ -1,14 +1,10 @@
 /**
- * Describes one Kakuzaki function.
+ * Describes one user defined or builtin Kakuzaki function.
  */
 
-package ParserTools.Nodes.StructureNodes;
+package CrossStageTools.CrossStageNodes;
 
 import java.util.ArrayList;
-
-import ParserTools.Nodes.ASTNode;
-import ParserTools.Nodes.StructureNodes.StatementNodes.StatementNode;
-import ParserTools.Nodes.StructureNodes.StatementNodes.VariableNode;
 
 public class FunctionNode extends ASTNode
 {
@@ -18,6 +14,8 @@ public class FunctionNode extends ASTNode
     private String name;
 
     private int lineNumber;
+
+    private boolean isVariadic;
 
     /**
      * Constructs a FunctionNode with the incoming ArrayLists as, respectively, the FunctionNode's statements,
@@ -38,6 +36,27 @@ public class FunctionNode extends ASTNode
         variableList = variables;
         name = incomingName;
         lineNumber = incomingLineNumber;
+        isVariadic = false;
+    }
+
+    /**
+     * Creates a FunctionNode with the incoming String as its name and the incoming boolean as whether it is variadic.
+     * Used in loading builtin functions.
+     *
+     * @param incomingName Incoming String.
+     * @param variadic Incoming boolean.
+     */
+    public FunctionNode(String incomingName, boolean variadic)
+    {
+        statementList = null;
+        parameterList = null;
+        variableList = null;
+
+        name = incomingName;
+
+        lineNumber = -1;
+
+        isVariadic = variadic;
     }
 
     /**
@@ -49,9 +68,23 @@ public class FunctionNode extends ASTNode
         return name;
     }
 
+    /**
+     * Checks and returns if this FunctionNode is variadic.
+     * @return True if this FunctionNode is variadic.
+     */
+    public boolean isVariadic()
+    {
+        return isVariadic;
+    }
+
     @Override
     public String toString()
     {
+        if (lineNumber == -1)
+        {
+            return "";
+        }
+
         String functionString = "Function " + name + " defined on line " + lineNumber;
 
         for (int i = 0; i < parameterList.size(); i++)

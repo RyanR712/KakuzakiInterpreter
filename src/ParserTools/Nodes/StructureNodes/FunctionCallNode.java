@@ -6,7 +6,7 @@ package ParserTools.Nodes.StructureNodes;
 
 import java.util.ArrayList;
 
-import ParserTools.Nodes.StructureNodes.StatementNodes.StatementNode;
+import CrossStageTools.CrossStageNodes.StatementNode;
 
 public class FunctionCallNode extends StatementNode
 {

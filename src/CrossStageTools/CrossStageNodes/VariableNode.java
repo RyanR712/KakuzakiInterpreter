@@ -2,10 +2,10 @@
  * Describes a declared variable in the AST.
  */
 
-package ParserTools.Nodes.StructureNodes.StatementNodes;
+package CrossStageTools.CrossStageNodes;
 
+import CrossStageTools.CrossStageNodes.ASTNode;
 import CrossStageTools.tokenType;
-import ParserTools.Nodes.ASTNode;
 
 public class VariableNode extends ASTNode
 {

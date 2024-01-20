@@ -4,6 +4,8 @@
 
 package InterpreterTools.InterpreterDataTypes;
 
+import CrossStageTools.CrossStageNodes.VariableNode;
+
 public class RealDataType extends InterpreterDataType
 {
     private float data;
@@ -29,6 +31,15 @@ public class RealDataType extends InterpreterDataType
         isChangeable = changeable;
     }
 
+    public RealDataType(VariableNode incomingVar)
+    {
+        data = Float.parseFloat(incomingVar.toString());
+
+        lineNumber = incomingVar.getLineNumber();
+
+        isChangeable = incomingVar.isChangeable();
+    }
+
     @Override
     public String toString()
     {
@@ -45,5 +56,11 @@ public class RealDataType extends InterpreterDataType
     public boolean isChangeable()
     {
         return isChangeable;
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 }

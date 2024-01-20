@@ -4,6 +4,8 @@
 
 package ParserTools.Nodes.DataTypeNodes;
 
+import InterpreterTools.InterpreterDataTypes.IntegerDataType;
+
 public class IntegerNode extends DataTypeNode
 {
     private int data;
@@ -21,6 +23,12 @@ public class IntegerNode extends DataTypeNode
     {
         data = incomingData;
         lineNumber = line;
+    }
+
+    public IntegerNode(IntegerDataType idt)
+    {
+        data = Integer.parseInt(idt.toString());
+        lineNumber = idt.getLineNumber();
     }
 
     /**

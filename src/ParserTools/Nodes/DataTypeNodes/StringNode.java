@@ -4,6 +4,8 @@
 
 package ParserTools.Nodes.DataTypeNodes;
 
+import InterpreterTools.InterpreterDataTypes.StringDataType;
+
 public class StringNode extends DataTypeNode
 {
     private String data;
@@ -20,6 +22,12 @@ public class StringNode extends DataTypeNode
     {
         data = incomingData;
         lineNumber = line;
+    }
+
+    public StringNode(StringDataType sdt)
+    {
+        data = sdt.toString();
+        lineNumber = sdt.getLineNumber();
     }
 
     /**

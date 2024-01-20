@@ -45,6 +45,16 @@ public class VariableReferenceNode extends ASTNode
         lineNumber = line;
     }
 
+    /**
+     * Returns this VariableReferenceNode's name.
+     *
+     * @return This VariableReferenceNode's name.
+     */
+    public String getName()
+    {
+        return referencedName;
+    }
+
     @Override
     public String toString()
     {

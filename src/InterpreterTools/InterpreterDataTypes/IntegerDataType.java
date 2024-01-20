@@ -4,6 +4,9 @@
 
 package InterpreterTools.InterpreterDataTypes;
 
+import CrossStageTools.CrossStageNodes.VariableNode;
+import ParserTools.Nodes.DataTypeNodes.IntegerNode;
+
 public class IntegerDataType extends InterpreterDataType
 {
     private int data, lineNumber;
@@ -28,6 +31,15 @@ public class IntegerDataType extends InterpreterDataType
         isChangeable = changeable;
     }
 
+    public IntegerDataType(VariableNode incomingVar)
+    {
+        data = Integer.parseInt(incomingVar.toString());
+
+        lineNumber = incomingVar.getLineNumber();
+
+        isChangeable = incomingVar.isChangeable();
+    }
+
     @Override
     public String toString()
     {
@@ -44,5 +56,11 @@ public class IntegerDataType extends InterpreterDataType
     public boolean isChangeable()
     {
         return isChangeable;
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 }

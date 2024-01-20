@@ -69,4 +69,10 @@ public class ArrayDataType extends InterpreterDataType
     {
         return isChangeable;
     }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
+    }
 }

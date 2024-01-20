@@ -30,6 +30,26 @@ public class AssignmentNode extends StatementNode
         lineNumber = line;
     }
 
+    /**
+     * Returns this AssignmentNode's target.
+     *
+     * @return This AssignmentNode's target.
+     */
+    public VariableReferenceNode getTarget()
+    {
+        return referencedTarget;
+    }
+
+    /**
+     * Returns this AssignmentNode's value.
+     *
+     * @return This AssignmentNode's value.
+     */
+    public ASTNode getValue()
+    {
+        return referencedValue;
+    }
+
     @Override
     public String toString()
     {

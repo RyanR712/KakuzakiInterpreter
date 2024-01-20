@@ -4,6 +4,8 @@
 
 package InterpreterTools.InterpreterDataTypes;
 
+import CrossStageTools.CrossStageNodes.VariableNode;
+
 public class CharacterDataType extends InterpreterDataType
 {
     private char data;
@@ -29,6 +31,15 @@ public class CharacterDataType extends InterpreterDataType
         isChangeable = changeable;
     }
 
+    public CharacterDataType(VariableNode incomingVar)
+    {
+        data = incomingVar.toString().charAt(0);
+
+        lineNumber = incomingVar.getLineNumber();
+
+        isChangeable = isChangeable();
+    }
+
     @Override
     public String toString()
     {
@@ -45,5 +56,11 @@ public class CharacterDataType extends InterpreterDataType
     public boolean isChangeable()
     {
         return isChangeable;
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 }

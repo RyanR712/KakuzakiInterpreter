@@ -43,6 +43,16 @@ public class ProgramNode extends ASTNode
         functionMap.putAll(addendumMap);
     }
 
+    /**
+     * Returns this ProgramNode's function HashMap.
+     *
+     * @return This ProgramNode's function HashMap.
+     */
+    public HashMap<String, FunctionNode> getFunctionMap()
+    {
+        return functionMap;
+    }
+
     @Override
     public String toString()
     {

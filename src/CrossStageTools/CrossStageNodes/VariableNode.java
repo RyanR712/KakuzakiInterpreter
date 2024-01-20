@@ -65,6 +65,16 @@ public class VariableNode extends ASTNode
     }
 
     /**
+     * Returns this VariableNode's name.
+     *
+     * @return This VariableNode's name.
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
      * Returns this VariableNode's tokenType.
      *
      * @return This VariableNode's tokenType.
@@ -112,6 +122,16 @@ public class VariableNode extends ASTNode
     public void setHigherRange(ASTNode higher)
     {
         higherRange = higher;
+    }
+
+    /**
+     * Returns if this VariableNode is changeable, i.e. if it is variable.
+     *
+     * @return True if this VariableNode is variable. False if it is constant.
+     */
+    public boolean isChangeable()
+    {
+        return isChangeable;
     }
 
     /**

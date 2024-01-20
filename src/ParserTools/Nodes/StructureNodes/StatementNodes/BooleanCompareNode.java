@@ -36,6 +36,36 @@ public class BooleanCompareNode extends ASTNode
     }
 
     /**
+     * Returns this BooleanCompareNode's left comparand.
+     *
+     * @return This BooleanCompareNode's left comparand.
+     */
+    public ASTNode getLeftComparand()
+    {
+        return leftComparand;
+    }
+
+    /**
+     * Returns this BooleanCompareNode's right comparand.
+     *
+     * @return This BooleanCompareNode's right comparand.
+     */
+    public ASTNode getRightComparand()
+    {
+        return rightComparand;
+    }
+
+    /**
+     * Returns this BooleanCompareNode's comparisonType.
+     *
+     * @return This BooleanCompareNode's comparisonType.
+     */
+    public comparisonType getCompType()
+    {
+        return compType;
+    }
+
+    /**
      * Translates the incoming tokenType to a comparisonType and returns that comparisonType.
      *
      * @param tType Incoming tokenType.

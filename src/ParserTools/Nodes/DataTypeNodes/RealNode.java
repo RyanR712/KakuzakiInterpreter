@@ -4,6 +4,8 @@
 
 package ParserTools.Nodes.DataTypeNodes;
 
+import InterpreterTools.InterpreterDataTypes.RealDataType;
+
 public class RealNode extends DataTypeNode
 {
     private float data, lowerRange, higherRange;
@@ -20,6 +22,12 @@ public class RealNode extends DataTypeNode
     {
         data = incomingData;
         lineNumber = line;
+    }
+
+    public RealNode(RealDataType rdt)
+    {
+        data = Float.parseFloat(rdt.toString());
+        lineNumber = rdt.getLineNumber();
     }
 
     /**

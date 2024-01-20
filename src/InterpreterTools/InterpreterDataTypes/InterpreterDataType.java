@@ -22,4 +22,11 @@ public abstract class InterpreterDataType
      * @return True if this InterpreterDataType is variable. False if this InterpreterDataType is constant.
      */
     public abstract boolean isChangeable();
+
+    /**
+     * Returns this InterpreterDataType's line number.
+     *
+     * @return This InterpreterDataType's line number.
+     */
+    public abstract int getLineNumber();
 }

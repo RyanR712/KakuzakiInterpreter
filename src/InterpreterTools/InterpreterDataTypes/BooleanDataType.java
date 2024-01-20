@@ -4,6 +4,8 @@
 
 package InterpreterTools.InterpreterDataTypes;
 
+import CrossStageTools.CrossStageNodes.VariableNode;
+
 public class BooleanDataType extends InterpreterDataType
 {
     private boolean data, isChangeable;
@@ -28,6 +30,15 @@ public class BooleanDataType extends InterpreterDataType
         isChangeable = changeable;
     }
 
+    public BooleanDataType(VariableNode incomingVar)
+    {
+        data = Boolean.parseBoolean(incomingVar.toString());
+
+        lineNumber = incomingVar.getLineNumber();
+
+        isChangeable = incomingVar.isChangeable();
+    }
+
     @Override
     public String toString()
     {
@@ -44,5 +55,11 @@ public class BooleanDataType extends InterpreterDataType
     public boolean isChangeable()
     {
         return isChangeable;
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 }

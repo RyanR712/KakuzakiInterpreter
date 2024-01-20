@@ -32,6 +32,26 @@ public class RepeatNode extends StatementNode
         lineNumber = line;
     }
 
+    /**
+     * Returns this RepeatNode's conditional.
+     *
+     * @return This RepeatNode's conditional.
+     */
+    public BooleanCompareNode getConditional()
+    {
+        return conditional;
+    }
+
+    /**
+     * Returns this RepeatNode's StatementNode list.
+     *
+     * @return This RepeatNode's StatementNode list.
+     */
+    public ArrayList<StatementNode> getStatements()
+    {
+        return statements;
+    }
+
     @Override
     public String toString()
     {

@@ -63,6 +63,26 @@ public class IfNode extends StatementNode
     }
 
     /**
+     * Returns this IfNode's conditional.
+     *
+     * @return This IfNode's conditional.
+     */
+    public BooleanCompareNode getConditional()
+    {
+        return conditional;
+    }
+
+    /**
+     * Returns this IfNode's StatementNode list.
+     *
+     * @return This IfNode's StatementNode list.
+     */
+    public ArrayList<StatementNode> getStatements()
+    {
+        return statements;
+    }
+
+    /**
      * Checks and returns whether this IfNode has a chained IfNode immediately after.
      *
      * @return True if the next IfNode is not null.
@@ -81,6 +101,16 @@ public class IfNode extends StatementNode
     public void setNext(IfNode next)
     {
         nextIf = next;
+    }
+
+    /**
+     * Returns this IfNode's next IfNode.
+     *
+     * @return This IfNode's next IfNode.
+     */
+    public IfNode getNext()
+    {
+        return nextIf;
     }
 
     /**

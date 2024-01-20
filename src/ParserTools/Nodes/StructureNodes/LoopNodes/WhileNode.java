@@ -33,6 +33,26 @@ public class WhileNode extends StatementNode
         lineNumber = line;
     }
 
+    /**
+     * Returns this WhileNode's conditional.
+     *
+     * @return This WhileNode's conditional.
+     */
+    public BooleanCompareNode getConditional()
+    {
+        return conditional;
+    }
+
+    /**
+     * Returns this WhileNode's StatementNode list.
+     *
+     * @return This WhileNode's StatementNode list.
+     */
+    public ArrayList<StatementNode> getStatements()
+    {
+        return statements;
+    }
+
     @Override
     public String toString()
     {

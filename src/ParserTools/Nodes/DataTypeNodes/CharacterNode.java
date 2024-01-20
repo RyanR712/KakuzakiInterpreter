@@ -4,6 +4,8 @@
 
 package ParserTools.Nodes.DataTypeNodes;
 
+import InterpreterTools.InterpreterDataTypes.CharacterDataType;
+
 public class CharacterNode extends DataTypeNode
 {
     private char data;
@@ -20,6 +22,12 @@ public class CharacterNode extends DataTypeNode
     {
         data = incomingData;
         lineNumber = line;
+    }
+
+    public CharacterNode(CharacterDataType cdt)
+    {
+        data = cdt.toString().charAt(0);
+        lineNumber = cdt.getLineNumber();
     }
 
     /**

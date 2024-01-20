@@ -69,6 +69,36 @@ public class FunctionNode extends ASTNode
     }
 
     /**
+     * Returns this FunctionNode's parameter list.
+     *
+     * @return This FunctionNode's parameter list.
+     */
+    public ArrayList<VariableNode> getParameterList()
+    {
+        return parameterList;
+    }
+
+    /**
+     * Returns this FunctionNode's variable list.
+     *
+     * @return This FunctionNode's variable list.
+     */
+    public ArrayList<VariableNode> getVariableList()
+    {
+        return variableList;
+    }
+
+    /**
+     * Returns this FunctionNode's statement list.
+     *
+     * @return This FunctionNode's statement list.
+     */
+    public ArrayList<StatementNode> getStatementList()
+    {
+        return statementList;
+    }
+
+    /**
      * Checks and returns if this FunctionNode is variadic.
      * @return True if this FunctionNode is variadic.
      */

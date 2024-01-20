@@ -54,7 +54,7 @@ public class Parser
     {
         program = new ProgramNode(new HashMap<>());
         FunctionNode functionToAdd;
-        while (!tokenList.isEmpty() && (functionToAdd = function()) != null)
+        while (!tokenList.isEmpty() && (functionToAdd = handleFunction()) != null)
         {
             program.addFunction(functionToAdd);
         }
@@ -100,7 +100,7 @@ public class Parser
      * @return FunctionNode with parameters, variables, constants and statements in its scope.
      * @throws SyntaxErrorException If the Kakuzaki syntax for functions is violated.
      */
-    private FunctionNode function() throws SyntaxErrorException
+    private FunctionNode handleFunction() throws SyntaxErrorException
     {
         if (matchAndRemove(tokenType.DEFINE) == null)
         {

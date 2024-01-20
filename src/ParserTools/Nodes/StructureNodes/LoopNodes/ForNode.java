@@ -45,6 +45,46 @@ public class ForNode extends StatementNode
         lineNumber = line;
     }
 
+    /**
+     * Returns this ForNode's iterator.
+     *
+     * @return This ForNode's iterator.
+     */
+    public VariableReferenceNode getIterator()
+    {
+        return iterator;
+    }
+
+    /**
+     * Returns this ForNode's from condition.
+     *
+     * @return This ForNode's from condition.
+     */
+    public ASTNode getFromNode()
+    {
+        return fromNode;
+    }
+
+    /**
+     * Returns this ForNode's to condition.
+     *
+     * @return This ForNode's to condition.
+     */
+    public ASTNode getToNode()
+    {
+        return toNode;
+    }
+
+    /**
+     * Returns this ForNode's StatementNode list.
+     *
+     * @return This ForNode's StatementNode list.
+     */
+    public ArrayList<StatementNode> getStatements()
+    {
+        return statements;
+    }
+
     @Override
     public String toString()
     {

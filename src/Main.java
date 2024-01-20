@@ -21,6 +21,7 @@ import InterpreterTools.BuiltInFunctions.Arrays.*;
 import InterpreterTools.BuiltInFunctions.IO.*;
 import InterpreterTools.BuiltInFunctions.Numbers.*;
 import InterpreterTools.BuiltInFunctions.Strings.*;
+import InterpreterTools.Interpreter;
 import LexerTools.Lexer;
 import CrossStageTools.CrossStageNodes.ProgramNode;
 import ParserTools.Parser;
@@ -84,7 +85,9 @@ public class Main
 
             program.addMap(loadBuiltInFunctions());
 
-            System.out.println(program);
+            Interpreter interpreter = new Interpreter(program);
+
+            interpreter.interpret();
         }
     }
 

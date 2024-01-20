@@ -4,6 +4,8 @@
 
 package ParserTools.Nodes.DataTypeNodes;
 
+import InterpreterTools.InterpreterDataTypes.BooleanDataType;
+
 public class BooleanNode extends DataTypeNode
 {
     private boolean data;
@@ -20,6 +22,12 @@ public class BooleanNode extends DataTypeNode
     {
         data = incomingData;
         lineNumber = line;
+    }
+
+    public BooleanNode(BooleanDataType bdt)
+    {
+        data = Boolean.parseBoolean(bdt.toString());
+        lineNumber = bdt.getLineNumber();
     }
 
     /**

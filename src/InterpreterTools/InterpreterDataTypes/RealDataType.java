@@ -11,9 +11,9 @@ public class RealDataType extends InterpreterDataType
 {
     private float data;
 
-    private int lineNumber;
+    private final int lineNumber;
 
-    private boolean isChangeable;
+    private final boolean isChangeable;
 
     /**
      * Creates a RealDataType with the incoming float as its data,

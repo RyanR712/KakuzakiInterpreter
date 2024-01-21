@@ -1,26 +1,6 @@
 define start()
-constants one = 1
-constants two = 2
-variables testInt, testIntTwo: integer
-variables testReal: real
-    testInt := 0
-    testIntTwo := ~10
-    while testInt < 10
-        testInt := testInt + 1
+variables testInt: integer
 
-    repeat until testIntTwo = 10
-        testIntTwo := testIntTwo + two
-
-    for i from 0 to 10
-        testReal := testReal + 0.1
-
-
-    if testInt < 10
-        testInt := 10
-    elsif testInt > 10
-        testInt := 20
-    elsif testInt > 90
-        testInt := 40
-    else
-        while testInt < 50
-            testInt := testInt + 5
+    while testInt < 100
+        write testInt
+        testInt := testInt + 5

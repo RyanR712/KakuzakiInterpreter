@@ -12,7 +12,7 @@ import CrossStageTools.tokenType;
 
 public class ProgramNode extends ASTNode
 {
-    private HashMap<String, FunctionNode> functionMap;
+    private final HashMap<String, FunctionNode> functionMap;
 
     /**
      * Constructs a ProgramNode with the incoming HashMap from String to FunctionNode as its function HashMap.

@@ -9,9 +9,10 @@ import ParserTools.Nodes.DataTypeNodes.IntegerNode;
 
 public class IntegerDataType extends InterpreterDataType
 {
-    private int data, lineNumber;
+    private final int lineNumber;
+    private int data;
 
-    private boolean isChangeable;
+    private final boolean isChangeable;
 
     /**
      * Creates an IntegerDataType with the former incoming int as its data,

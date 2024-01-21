@@ -13,13 +13,13 @@ import ParserTools.Nodes.StructureNodes.StatementNodes.VariableReferenceNode;
 
 public class ForNode extends StatementNode
 {
-    private VariableReferenceNode iterator;
+    private final VariableReferenceNode iterator;
 
-    private ASTNode fromNode, toNode;
+    private final ASTNode fromNode, toNode;
 
-    private ArrayList<StatementNode> statements;
+    private final ArrayList<StatementNode> statements;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Creates a ForNode with the incoming VariableReferenceNode as its iterator,

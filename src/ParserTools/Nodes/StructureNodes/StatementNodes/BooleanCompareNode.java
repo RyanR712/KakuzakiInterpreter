@@ -11,10 +11,8 @@ public class BooleanCompareNode extends ASTNode
 {
     public enum comparisonType {GTHAN, LTHAN, GETO, LETO, EQUAL, NEQUAL, NOT, AND, OR}
 
-    private ASTNode leftComparand, rightComparand;
-    private comparisonType compType;
-
-    private int lineNumber;
+    private final ASTNode leftComparand, rightComparand;
+    private final comparisonType compType;
 
     /**
      * Constructs a BooleanCompareNode with the former incoming ASTNode as its left comparand,
@@ -32,7 +30,6 @@ public class BooleanCompareNode extends ASTNode
         compType = tokenTypeToComparisonType(comp);
         rightComparand = rightComp;
 
-        lineNumber = line;
     }
 
     /**

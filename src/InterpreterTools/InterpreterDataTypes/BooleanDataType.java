@@ -9,9 +9,10 @@ import ParserTools.Nodes.DataTypeNodes.BooleanNode;
 
 public class BooleanDataType extends InterpreterDataType
 {
-    private boolean data, isChangeable;
+    private final boolean isChangeable;
+    private boolean data;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Creates a BooleanDataType with the former incoming boolean as its data,

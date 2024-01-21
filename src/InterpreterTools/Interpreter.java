@@ -8,13 +8,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import CrossStageTools.CrossStageNodes.*;
+import Exceptions.InvalidArgumentsException;
 import Exceptions.NonexistantVariableException;
 import Exceptions.SyntaxErrorException;
 import Exceptions.UnchangeableVariableException;
+import InterpreterTools.BuiltInFunctions.BuiltInFunctionNode;
 import InterpreterTools.InterpreterDataTypes.*;
 import ParserTools.Nodes.DataTypeNodes.*;
 import ParserTools.Nodes.MathOpNode;
 import ParserTools.Nodes.MathOpNode.operationType;
+import ParserTools.Nodes.StructureNodes.ArgumentNode;
+import ParserTools.Nodes.StructureNodes.FunctionCallNode;
 import ParserTools.Nodes.StructureNodes.IfNode;
 import ParserTools.Nodes.StructureNodes.LoopNodes.*;
 import ParserTools.Nodes.StructureNodes.StatementNodes.AssignmentNode;
@@ -26,9 +30,9 @@ public class Interpreter
 {
     private enum typeCheckResult {FAILURE, INTEGER, REAL, STRING, CHARACTER, BOOLEAN}
 
-    private ProgramNode program;
+    private final ProgramNode program;
 
-    private HashMap<String, FunctionNode> functionMap;
+    private final HashMap<String, FunctionNode> functionMap;
 
     public Interpreter(ProgramNode parsedProgram)
     {
@@ -38,18 +42,46 @@ public class Interpreter
 
     public void interpret() throws SyntaxErrorException
     {
-        interpretFunction("start");
+        interpretFunction(program.getFunctionMap().get("start"), new ArrayList<>());
     }
 
-    private void interpretFunction(String functionName) throws SyntaxErrorException
+    private void interpretFunction(FunctionNode function, ArrayList<InterpreterDataType> arguments) throws SyntaxErrorException
     {
-        HashMap<String, InterpreterDataType> localVariables = handleVariables(functionName);
-
-        interpretStatements(functionMap.get(functionName).getStatementList(), localVariables);
+        if (function instanceof BuiltInFunctionNode)
+        {
+            ((BuiltInFunctionNode)function).execute(arguments);
+        }
+        else
+        {
+            HashMap<String, InterpreterDataType> localVariables = handleVariables(function);
+            interpretStatements(function.getStatementList(), localVariables);
+        }
     }
 
-    private HashMap<String, InterpreterDataType> handleVariables(String functionName)
+    private ArrayList<InterpreterDataType> handleParameters(
+            FunctionNode function, HashMap<String, InterpreterDataType> variables)
     {
+        ArrayList<VariableNode> parameters = function.getParameterList();
+
+        ArrayList<InterpreterDataType> arguments = new ArrayList<>();
+
+        for (int i = 0; i < parameters.size(); i++)
+        {
+            arguments.add(makeInterpreterDataTypeFromNode(interpretExpression(parameters.get(i), variables)));
+            variables.put(parameters.get(i).getName(), arguments.get(i));
+        }
+        return arguments;
+    }
+
+    private HashMap<String, InterpreterDataType> handleVariables(FunctionNode function)
+    {
+        if (function instanceof BuiltInFunctionNode)
+        {
+            return null;
+        }
+
+        String functionName = function.getName();
+
         HashMap<String, InterpreterDataType> localVariables = new HashMap<>();
 
         ArrayList<VariableNode> variables = functionMap.get(functionName).getVariableList();
@@ -102,6 +134,10 @@ public class Interpreter
             else if (currentStatement instanceof AssignmentNode)
             {
                 interpretAssignment((AssignmentNode)currentStatement, variables);
+            }
+            else if (currentStatement instanceof FunctionCallNode)
+            {
+                interpretFunctionCall((FunctionCallNode)currentStatement, variables);
             }
         }
     }
@@ -176,6 +212,40 @@ public class Interpreter
         }
     }
 
+    private void interpretFunctionCall(FunctionCallNode calledFunction, HashMap<String, InterpreterDataType> variables)
+            throws SyntaxErrorException
+    {
+        FunctionNode function = functionMap.get(calledFunction.getName());
+
+        if (function.isVariadic() || (function.getNumberOfParameters() == calledFunction.getNumberOfArguments()))
+        {
+            interpretFunction(function, handleArguments(calledFunction.getArguments(), variables));
+        }
+        else throw new InvalidArgumentsException(calledFunction.getName(), calledFunction.getLineNumber());
+    }
+
+    private ArrayList<InterpreterDataType> handleArguments(
+            ArrayList<ArgumentNode> arguments, HashMap<String, InterpreterDataType> variables)
+    {
+        ArrayList<InterpreterDataType> argumentDataTypeList = new ArrayList<>();
+
+        ArgumentNode currentArgument;
+
+        ASTNode argumentContent;
+
+        for (int i = 0; i < arguments.size(); i++)
+        {
+            currentArgument = arguments.get(i);
+
+            argumentContent = currentArgument.isConstant() ?
+                    currentArgument.getConstant() : currentArgument.getVariableReference();
+
+            argumentDataTypeList.add(makeInterpreterDataTypeFromNode(interpretExpression(argumentContent, variables)));
+        }
+
+        return argumentDataTypeList;
+    }
+
     private ASTNode interpretExpression(ASTNode operand, HashMap<String, InterpreterDataType> variables)
     {
         if (operand instanceof VariableReferenceNode)
@@ -246,8 +316,6 @@ public class Interpreter
 
     private InterpreterDataType makeInterpreterDataTypeFromNode(ASTNode incomingNode)
     {
-        InterpreterDataType idt;
-
         if (incomingNode instanceof IntegerNode)
         {
             return new IntegerDataType((IntegerNode)incomingNode);

@@ -12,16 +12,12 @@ import InterpreterTools.InterpreterDataTypes.InterpreterDataType;
 
 public class Read extends BuiltInFunctionNode
 {
-    String name;
-
-    boolean isVariadic;
-
     /**
      * Creates the builtin function read, which takes <i>n</i> var arguments and reads items from STDIn into them.
      */
     public Read()
     {
-        super("read", true);
+        super("read", true, new ArrayList<>());
     }
 
     @Override

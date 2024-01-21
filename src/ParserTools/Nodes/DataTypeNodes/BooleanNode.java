@@ -9,9 +9,9 @@ import InterpreterTools.InterpreterDataTypes.BooleanDataType;
 
 public class BooleanNode extends DataTypeNode
 {
-    private boolean data;
+    private final boolean data;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Constructs a Boolean ASTNode with the incoming boolean as its data with the incoming int as its line number.

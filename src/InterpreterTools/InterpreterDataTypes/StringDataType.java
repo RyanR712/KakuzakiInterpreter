@@ -11,9 +11,9 @@ public class StringDataType extends InterpreterDataType
 {
     private String data;
 
-    private int lineNumber;
+    private final int lineNumber;
 
-    private boolean isChangeable;
+    private final boolean isChangeable;
 
     /**
      * Creates a StringDataType with the incoming String as its data,

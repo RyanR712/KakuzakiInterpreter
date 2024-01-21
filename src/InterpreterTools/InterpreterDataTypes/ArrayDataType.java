@@ -6,11 +6,11 @@ package InterpreterTools.InterpreterDataTypes;
 
 public class ArrayDataType extends InterpreterDataType
 {
-    private InterpreterDataType[] data;
+    private final InterpreterDataType[] data;
 
-    private int lineNumber;
+    private final int lineNumber;
 
-    private boolean isChangeable;
+    private final boolean isChangeable;
 
     /**
      * Creates an ArrayDataType with the incoming InterpreterDataType array as its data,

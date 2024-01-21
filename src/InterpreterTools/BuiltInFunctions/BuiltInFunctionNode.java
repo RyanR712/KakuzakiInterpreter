@@ -7,6 +7,7 @@ package InterpreterTools.BuiltInFunctions;
 import java.util.ArrayList;
 
 import CrossStageTools.CrossStageNodes.FunctionNode;
+import CrossStageTools.CrossStageNodes.VariableNode;
 import InterpreterTools.InterpreterDataTypes.InterpreterDataType;
 
 public abstract class BuiltInFunctionNode extends FunctionNode
@@ -19,6 +20,11 @@ public abstract class BuiltInFunctionNode extends FunctionNode
      * @param variadic Incoming boolean.
      * @see "For definitions: https://github.com/RyanR712/KakuzakiInterpreter/wiki/Built%E2%80%90in-Functions"
      */
+    public BuiltInFunctionNode(String name, boolean variadic, ArrayList<VariableNode> parameters)
+    {
+        super(name, variadic, parameters);
+    }
+
     public BuiltInFunctionNode(String name, boolean variadic)
     {
         super(name, variadic);

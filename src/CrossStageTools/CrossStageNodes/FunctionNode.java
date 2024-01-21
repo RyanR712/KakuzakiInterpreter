@@ -10,14 +10,14 @@ import java.util.ArrayList;
 
 public class FunctionNode extends ASTNode
 {
-    private ArrayList<StatementNode> statementList;
-    private ArrayList<VariableNode> parameterList, variableList;
+    private final ArrayList<StatementNode> statementList;
+    private final ArrayList<VariableNode> parameterList, variableList;
 
-    private String name;
+    private final String name;
 
-    private int lineNumber;
+    private final int lineNumber;
 
-    private boolean isVariadic;
+    private final boolean isVariadic;
 
     /**
      * Constructs a FunctionNode with the incoming ArrayLists as, respectively, the FunctionNode's statements,
@@ -39,6 +39,27 @@ public class FunctionNode extends ASTNode
         name = incomingName;
         lineNumber = incomingLineNumber;
         isVariadic = false;
+    }
+
+    /**
+     * Creates a FunctionNode with the incoming String as its name and the incoming boolean as whether it is variadic.
+     * Used in loading builtin functions.
+     *
+     * @param incomingName Incoming String.
+     * @param variadic Incoming boolean.
+     * @param parameters Incoming parameter list.
+     */
+    public FunctionNode(String incomingName, boolean variadic, ArrayList<VariableNode> parameters)
+    {
+        statementList = null;
+        parameterList = parameters;
+        variableList = null;
+
+        name = incomingName;
+
+        lineNumber = -1;
+
+        isVariadic = variadic;
     }
 
     /**
@@ -78,6 +99,16 @@ public class FunctionNode extends ASTNode
     public ArrayList<VariableNode> getParameterList()
     {
         return parameterList;
+    }
+
+    /**
+     * Returns the number of parameters in this FunctionNode's definition.
+     *
+     * @return Number of parameters in this FunctionNode's definition.
+     */
+    public int getNumberOfParameters()
+    {
+        return parameterList.size();
     }
 
     /**

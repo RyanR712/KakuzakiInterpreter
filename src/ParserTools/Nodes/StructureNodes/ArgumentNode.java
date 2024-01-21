@@ -10,13 +10,13 @@ import ParserTools.Nodes.StructureNodes.StatementNodes.VariableReferenceNode;
 
 public class ArgumentNode extends ASTNode
 {
-    private VariableReferenceNode variableParam;
+    private final VariableReferenceNode variableParam;
 
-    private ASTNode constantParam;
+    private final ASTNode constantParam;
 
-    private int lineNumber;
+    private final int lineNumber;
 
-    private boolean isConstant;
+    private final boolean isConstant;
 
     /**
      * Creates an ArgumentNode with the incoming VariableReferenceNode as its variable value
@@ -47,6 +47,36 @@ public class ArgumentNode extends ASTNode
 
         lineNumber = line;
         isConstant = true;
+    }
+
+    /**
+     * Returns the VariableReferenceNode from this ArgumentNode.
+     *
+     * @return VariableReferenceNode from this ArgumentNode.
+     */
+    public VariableReferenceNode getVariableReference()
+    {
+        return variableParam;
+    }
+
+    /**
+     * Returns the constant ASTNode from this ArgumentNode.
+     *
+     * @return Constant ASTNode from this ArgumentNode.
+     */
+    public ASTNode getConstant()
+    {
+        return constantParam;
+    }
+
+    /**
+     * Returns whether this ArgumentNode is constant.
+     *
+     * @return True if this ArgumentNode is constant.
+     */
+    public boolean isConstant()
+    {
+        return isConstant;
     }
 
     @Override

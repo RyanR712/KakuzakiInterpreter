@@ -9,9 +9,9 @@ import InterpreterTools.InterpreterDataTypes.CharacterDataType;
 
 public class CharacterNode extends DataTypeNode
 {
-    private char data;
+    private final char data;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Constructs a Character ASTNode with the incoming char as its data with the incoming int as its line number.

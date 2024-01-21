@@ -9,9 +9,10 @@ import InterpreterTools.InterpreterDataTypes.StringDataType;
 
 public class StringNode extends DataTypeNode
 {
-    private String data;
+    private final String data;
 
-    private int lowerRange, higherRange, lineNumber;
+    private final int lineNumber;
+    private int lowerRange, higherRange;
 
     /**
      * Constructs a String ASTNode with the incoming String as its data with the incoming int as its line number.

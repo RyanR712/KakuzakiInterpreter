@@ -11,13 +11,15 @@ public class VariableNode extends ASTNode
 {
     private ASTNode lowerRange, higherRange;
 
-    private String name, value;
+    private final String name;
+    private String value;
 
     private tokenType type;
 
-    private int lineNumber;
+    private final int lineNumber;
 
-    private boolean isChangeable, isRanged;
+    private final boolean isChangeable;
+    private boolean isRanged;
 
     //TODO: try to receive the type and line number from a Token object?
     /**

@@ -9,9 +9,9 @@ import InterpreterTools.InterpreterDataTypes.IntegerDataType;
 
 public class IntegerNode extends DataTypeNode
 {
-    private int data;
+    private final int data, lineNumber;
 
-    private int lineNumber, lowerRange, higherRange;
+    private int lowerRange, higherRange;
 
     /**
      * Constructs an Integer ASTNode with the former incoming int as its data

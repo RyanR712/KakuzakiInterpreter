@@ -10,10 +10,10 @@ import CrossStageTools.tokenType;
 
 public class AssignmentNode extends StatementNode
 {
-    private VariableReferenceNode referencedTarget;
-    private ASTNode referencedValue;
+    private final VariableReferenceNode referencedTarget;
+    private final ASTNode referencedValue;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Constructs an Assignment node with the incoming VariableReferenceNode as its target,

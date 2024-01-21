@@ -11,10 +11,10 @@ public class MathOpNode extends ASTNode
 {
     public enum operationType {ADD, SUB, MULT, DIV, MOD}
 
-    private ASTNode leftOperand, rightOperand;
-    private operationType opType;
+    private final ASTNode leftOperand, rightOperand;
+    private final operationType opType;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Constructs a MathOpNode with the former incoming ASTNode as its left operand,

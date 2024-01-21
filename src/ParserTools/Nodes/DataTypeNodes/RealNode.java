@@ -9,9 +9,10 @@ import InterpreterTools.InterpreterDataTypes.RealDataType;
 
 public class RealNode extends DataTypeNode
 {
-    private float data, lowerRange, higherRange;
+    private final float data;
+    private float lowerRange, higherRange;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Constructs a Real ASTNode with the incoming float as its data and the incoming int as its line number.

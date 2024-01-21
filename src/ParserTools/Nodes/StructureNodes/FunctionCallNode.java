@@ -11,11 +11,11 @@ import CrossStageTools.tokenType;
 
 public class FunctionCallNode extends StatementNode
 {
-    private String calledName;
+    private final String calledName;
 
-    private ArrayList<ArgumentNode> arguments;
+    private final ArrayList<ArgumentNode> arguments;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Creates a FunctionCallNode with the incoming String as its name,
@@ -31,6 +31,36 @@ public class FunctionCallNode extends StatementNode
         arguments = incomingArguments;
 
         lineNumber = line;
+    }
+
+    /**
+     * Returns this FunctionCallNode's called function name.
+     *
+     * @return This FunctionCallNode's called function name.
+     */
+    public String getName()
+    {
+        return calledName;
+    }
+
+    /**
+     * Returns the number of arguments this function call was made with.
+     *
+     * @return Number of arguments this function call was made with.
+     */
+    public int getNumberOfArguments()
+    {
+        return arguments.size();
+    }
+
+    /**
+     * Returns this FunctionCallNode's argument list.
+     *
+     * @return This FunctionCallNode's argument list.
+     */
+    public ArrayList<ArgumentNode> getArguments()
+    {
+        return arguments;
     }
 
     @Override

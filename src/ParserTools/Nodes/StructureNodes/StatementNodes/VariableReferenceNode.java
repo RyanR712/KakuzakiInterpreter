@@ -9,11 +9,11 @@ import CrossStageTools.tokenType;
 
 public class VariableReferenceNode extends ASTNode
 {
-    private ASTNode arrayExpression;
+    private final ASTNode arrayExpression;
 
-    private String referencedName;
+    private final String referencedName;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Constructs a VariableReferenceNode with the incoming String as its name,

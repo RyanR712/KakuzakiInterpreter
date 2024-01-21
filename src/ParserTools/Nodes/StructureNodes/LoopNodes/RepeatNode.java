@@ -12,10 +12,10 @@ import CrossStageTools.CrossStageNodes.StatementNode;
 
 public class RepeatNode extends StatementNode
 {
-    private BooleanCompareNode conditional;
-    private ArrayList<StatementNode> statements;
+    private final BooleanCompareNode conditional;
+    private final ArrayList<StatementNode> statements;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Creates a RepeatNode with the incoming BooleanCompareNode as its conditional,

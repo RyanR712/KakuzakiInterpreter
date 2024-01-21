@@ -11,9 +11,9 @@ public class CharacterDataType extends InterpreterDataType
 {
     private char data;
 
-    private int lineNumber;
+    private final int lineNumber;
 
-    private boolean isChangeable;
+    private final boolean isChangeable;
 
     /**
      * Creates a CharacterDataType with the incoming char as its data,

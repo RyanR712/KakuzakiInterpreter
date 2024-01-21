@@ -16,7 +16,7 @@ public class Write extends BuiltInFunctionNode
      */
     public Write()
     {
-        super("write", true);
+        super("write", true, new ArrayList<>());
     }
 
     @Override

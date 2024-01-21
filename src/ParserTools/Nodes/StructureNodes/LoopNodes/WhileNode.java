@@ -12,11 +12,11 @@ import CrossStageTools.CrossStageNodes.StatementNode;
 
 public class WhileNode extends StatementNode
 {
-    private BooleanCompareNode conditional;
+    private final BooleanCompareNode conditional;
 
-    private ArrayList<StatementNode> statements;
+    private final ArrayList<StatementNode> statements;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Creates a WhileNode with the incoming BooleanCompareNode as its conditional,

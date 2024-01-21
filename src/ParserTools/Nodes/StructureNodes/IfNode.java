@@ -12,13 +12,13 @@ import CrossStageTools.CrossStageNodes.StatementNode;
 
 public class IfNode extends StatementNode
 {
-    private BooleanCompareNode conditional;
+    private final BooleanCompareNode conditional;
 
-    private ArrayList<StatementNode> statements;
+    private final ArrayList<StatementNode> statements;
 
     private IfNode nextIf;
 
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * Creates an IfNode with the incoming BooleanCompareNode as its conditional,

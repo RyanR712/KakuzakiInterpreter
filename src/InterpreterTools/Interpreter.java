@@ -30,22 +30,22 @@ public class Interpreter
 
     private HashMap<String, FunctionNode> functionMap;
 
-    private typeCheckResult typeCheck;
-
     public Interpreter(ProgramNode parsedProgram)
     {
         program = parsedProgram;
         functionMap = program.getFunctionMap();
     }
 
-    public void interpret()
+    public void interpret() throws SyntaxErrorException
     {
         interpretFunction("start");
     }
 
-    private void interpretFunction(String functionName)
+    private void interpretFunction(String functionName) throws SyntaxErrorException
     {
         HashMap<String, InterpreterDataType> localVariables = handleVariables(functionName);
+
+        interpretStatements(functionMap.get(functionName).getStatementList(), localVariables);
     }
 
     private HashMap<String, InterpreterDataType> handleVariables(String functionName)
@@ -56,21 +56,22 @@ public class Interpreter
 
         for (int i = 0; i < variables.size(); i++)
         {
-            localVariables.put(variables.get(i).getName(), handleDataType(variables.get(i)));
+            VariableNode currentVariable = variables.get(i);
+            localVariables.put(currentVariable.getName(), handleDataType(currentVariable, currentVariable.isChangeable()));
         }
 
         return localVariables;
     }
 
-    private InterpreterDataType handleDataType(VariableNode currentVariable)
+    private InterpreterDataType handleDataType(VariableNode currentVariable, boolean isInitializer)
     {
         switch (currentVariable.getType())
         {
-            case INTEGER   : return new IntegerDataType(currentVariable);
-            case REAL      : return new RealDataType(currentVariable);
-            case STRING    : return new StringDataType(currentVariable);
-            case CHARACTER : return new CharacterDataType(currentVariable);
-            case BOOLEAN   : return new BooleanDataType(currentVariable);
+            case INTEGER   : return new IntegerDataType(currentVariable, isInitializer);
+            case REAL      : return new RealDataType(currentVariable, isInitializer);
+            case STRING    : return new StringDataType(currentVariable, isInitializer);
+            case CHARACTER : return new CharacterDataType(currentVariable, isInitializer);
+            case BOOLEAN   : return new BooleanDataType(currentVariable, isInitializer);
             default        : return null;
         }
     }
@@ -111,7 +112,7 @@ public class Interpreter
         {
             interpretStatements(ifBlock.getStatements(), variables);
         }
-        else if (ifBlock.hasNext())
+        else
         {
             interpretIf(ifBlock.getNext(), variables);
         }
@@ -120,20 +121,20 @@ public class Interpreter
     private void interpretFor(ForNode forBlock, HashMap<String, InterpreterDataType> variables) throws SyntaxErrorException
     {
         String iteratorName = forBlock.getIterator().getName();
-        int lineNumber = forBlock.getIterator().getLineNumber();
+
         variables.put(iteratorName,
-                handleDataType((VariableNode)interpretExpression(forBlock.getFromNode(), variables)));
+                makeInterpreterDataTypeFromNode(interpretExpression(forBlock.getFromNode(), variables)));
 
         int cap = Integer.parseInt(interpretExpression(forBlock.getToNode(), variables).toString());
 
-        for (int iterator = Integer.parseInt(variables.get(forBlock.getIterator().getName()).toString());
+        for (int iterator = Integer.parseInt(variables.get(iteratorName).toString());
              iterator <= cap; iterator++)
         {
             interpretStatements(forBlock.getStatements(), variables);
-            variables.put(iteratorName, new IntegerDataType(iterator, lineNumber, true));
+            ((IntegerDataType)variables.get(iteratorName)).increment();
         }
 
-        variables.remove(forBlock.getIterator().getName());
+        variables.remove(iteratorName);
     }
 
     private void interpretRepeat(RepeatNode repeatBlock, HashMap<String, InterpreterDataType> variables) throws SyntaxErrorException
@@ -154,11 +155,6 @@ public class Interpreter
         }
     }
 
-    private void interpretConstant()
-    {
-
-    }
-
     private void interpretAssignment(AssignmentNode assignment, HashMap<String, InterpreterDataType> variables)
             throws SyntaxErrorException
     {
@@ -176,7 +172,7 @@ public class Interpreter
         else
         {
             variables.replace(targetName,
-                    handleDataType((VariableNode)interpretExpression(assignment.getValue(), variables)));
+            makeInterpreterDataTypeFromNode(interpretExpression(assignment.getValue(), variables)));
         }
     }
 
@@ -190,7 +186,7 @@ public class Interpreter
         {
             return interpretMathOp((MathOpNode)operand, variables);
         }
-        else if (operand instanceof DataTypeNode)
+        else if (operand instanceof DataTypeNode) //handles number constants
         {
             return operand;
         }
@@ -200,16 +196,16 @@ public class Interpreter
     private boolean interpretBooleanCompare(BooleanCompareNode comparison,
                                             HashMap<String, InterpreterDataType> variables)
     {
+        if (comparison == null) //else statements
+        {
+            return true;
+        }
+
         ASTNode leftComparand = interpretExpression(comparison.getLeftComparand(), variables);
         ASTNode rightComparand = interpretExpression(comparison.getRightComparand(), variables);
 
         return performComparison(leftComparand, rightComparand,
                                  checkTypes(leftComparand, rightComparand), comparison.getCompType());
-    }
-
-    private InterpreterDataType interpretVariableReference(String name, HashMap<String, InterpreterDataType> variables)
-    {
-        return variables.get(name);
     }
 
     private ASTNode interpretMathOp(MathOpNode mathOp, HashMap<String, InterpreterDataType> variables)
@@ -246,6 +242,33 @@ public class Interpreter
             return new BooleanNode((BooleanDataType)idt);
         }
         else return null;
+    }
+
+    private InterpreterDataType makeInterpreterDataTypeFromNode(ASTNode incomingNode)
+    {
+        InterpreterDataType idt;
+
+        if (incomingNode instanceof IntegerNode)
+        {
+            return new IntegerDataType((IntegerNode)incomingNode);
+        }
+        else if (incomingNode instanceof RealNode)
+        {
+            return new RealDataType((RealNode)incomingNode);
+        }
+        else if (incomingNode instanceof StringNode)
+        {
+            return new StringDataType((StringNode)incomingNode);
+        }
+        else if (incomingNode instanceof CharacterNode)
+        {
+            return new CharacterDataType((CharacterNode)incomingNode);
+        }
+        else if (incomingNode instanceof BooleanNode)
+        {
+            return new BooleanDataType((BooleanNode)incomingNode);
+        }
+        return null;
     }
 
     private typeCheckResult checkTypes(ASTNode left, ASTNode right)

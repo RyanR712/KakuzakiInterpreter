@@ -7,6 +7,7 @@ package ParserTools.Nodes.StructureNodes;
 import java.util.ArrayList;
 
 import CrossStageTools.CrossStageNodes.StatementNode;
+import CrossStageTools.tokenType;
 
 public class FunctionCallNode extends StatementNode
 {
@@ -54,5 +55,11 @@ public class FunctionCallNode extends StatementNode
     public int getLineNumber()
     {
         return lineNumber;
+    }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.NONE;
     }
 }

@@ -4,6 +4,8 @@
 
 package CrossStageTools.CrossStageNodes;
 
+import CrossStageTools.tokenType;
+
 public abstract class ASTNode
 {
     public abstract String toString();
@@ -13,4 +15,11 @@ public abstract class ASTNode
      * @return line number this ASTNode is on.
      */
     public abstract int getLineNumber();
+
+    /**
+     * Returns this DataTypeNode's data representation in a tokenType.
+     *
+     * @return This DataTypeNode's data representation in a tokenType.
+     */
+    public abstract tokenType getType();
 }

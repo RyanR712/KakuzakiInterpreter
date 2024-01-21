@@ -4,6 +4,7 @@
 
 package ParserTools.Nodes.DataTypeNodes;
 
+import CrossStageTools.tokenType;
 import InterpreterTools.InterpreterDataTypes.RealDataType;
 
 public class RealNode extends DataTypeNode
@@ -50,5 +51,11 @@ public class RealNode extends DataTypeNode
     public int getLineNumber()
     {
         return lineNumber;
+    }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.REAL;
     }
 }

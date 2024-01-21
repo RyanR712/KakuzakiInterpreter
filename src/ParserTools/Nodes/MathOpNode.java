@@ -114,4 +114,10 @@ public class MathOpNode extends ASTNode
     {
         return lineNumber;
     }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.NONE;
+    }
 }

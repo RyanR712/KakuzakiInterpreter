@@ -5,6 +5,7 @@
 package InterpreterTools.InterpreterDataTypes;
 
 import CrossStageTools.CrossStageNodes.VariableNode;
+import ParserTools.Nodes.DataTypeNodes.CharacterNode;
 
 public class CharacterDataType extends InterpreterDataType
 {
@@ -31,13 +32,22 @@ public class CharacterDataType extends InterpreterDataType
         isChangeable = changeable;
     }
 
-    public CharacterDataType(VariableNode incomingVar)
+    public CharacterDataType(VariableNode incomingVar, boolean isInitializer)
     {
-        data = incomingVar.toString().charAt(0);
+        data = isInitializer ? ' ' : incomingVar.getValue().charAt(0);
 
         lineNumber = incomingVar.getLineNumber();
 
-        isChangeable = isChangeable();
+        isChangeable = incomingVar.isChangeable();
+    }
+
+    public CharacterDataType(CharacterNode incomingChar)
+    {
+        data = incomingChar.toString().charAt(0);
+
+        lineNumber = incomingChar.getLineNumber();
+
+        isChangeable = true;
     }
 
     @Override

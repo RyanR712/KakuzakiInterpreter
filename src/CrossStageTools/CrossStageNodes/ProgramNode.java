@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import CrossStageTools.CrossStageNodes.ASTNode;
 import CrossStageTools.CrossStageNodes.FunctionNode;
+import CrossStageTools.tokenType;
 
 public class ProgramNode extends ASTNode
 {
@@ -74,5 +75,11 @@ public class ProgramNode extends ASTNode
     public int getLineNumber()
     {
         return 0;
+    }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.NONE;
     }
 }

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import CrossStageTools.CrossStageNodes.ASTNode;
 import CrossStageTools.CrossStageNodes.StatementNode;
+import CrossStageTools.tokenType;
 import ParserTools.Nodes.StructureNodes.StatementNodes.VariableReferenceNode;
 
 public class ForNode extends StatementNode
@@ -104,5 +105,11 @@ public class ForNode extends StatementNode
     public int getLineNumber()
     {
         return lineNumber;
+    }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.FOR;
     }
 }

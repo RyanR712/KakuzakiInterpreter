@@ -4,6 +4,8 @@
 
 package CrossStageTools.CrossStageNodes;
 
+import CrossStageTools.tokenType;
+
 import java.util.ArrayList;
 
 public class FunctionNode extends ASTNode
@@ -152,5 +154,11 @@ public class FunctionNode extends ASTNode
     public int getLineNumber()
     {
         return lineNumber;
+    }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.DEFINE;
     }
 }

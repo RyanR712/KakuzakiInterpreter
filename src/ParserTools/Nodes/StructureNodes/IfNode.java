@@ -6,6 +6,7 @@ package ParserTools.Nodes.StructureNodes;
 
 import java.util.ArrayList;
 
+import CrossStageTools.tokenType;
 import ParserTools.Nodes.StructureNodes.StatementNodes.BooleanCompareNode;
 import CrossStageTools.CrossStageNodes.StatementNode;
 
@@ -146,5 +147,11 @@ public class IfNode extends StatementNode
     public int getLineNumber()
     {
         return lineNumber;
+    }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.IF;
     }
 }

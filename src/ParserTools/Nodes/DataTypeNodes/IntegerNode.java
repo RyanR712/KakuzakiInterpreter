@@ -4,6 +4,7 @@
 
 package ParserTools.Nodes.DataTypeNodes;
 
+import CrossStageTools.tokenType;
 import InterpreterTools.InterpreterDataTypes.IntegerDataType;
 
 public class IntegerNode extends DataTypeNode
@@ -51,5 +52,11 @@ public class IntegerNode extends DataTypeNode
     public int getLineNumber()
     {
         return lineNumber;
+    }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.INTEGER;
     }
 }

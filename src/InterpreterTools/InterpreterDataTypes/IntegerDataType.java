@@ -31,13 +31,30 @@ public class IntegerDataType extends InterpreterDataType
         isChangeable = changeable;
     }
 
-    public IntegerDataType(VariableNode incomingVar)
+    public IntegerDataType(VariableNode incomingVar, boolean isInitializer)
     {
-        data = Integer.parseInt(incomingVar.toString());
+        data = isInitializer ? 0 : Integer.parseInt(incomingVar.getValue());
 
         lineNumber = incomingVar.getLineNumber();
 
         isChangeable = incomingVar.isChangeable();
+    }
+
+    public IntegerDataType(IntegerNode incomingInt)
+    {
+        data = Integer.parseInt(incomingInt.toString());
+
+        lineNumber = incomingInt.getLineNumber();
+
+        isChangeable = true;
+    }
+
+    /**
+     * Increments this IntegerNode's data.
+     */
+    public void increment()
+    {
+        data++;
     }
 
     @Override

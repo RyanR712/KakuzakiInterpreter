@@ -5,6 +5,7 @@
 package ParserTools.Nodes.DataTypeNodes;
 
 import CrossStageTools.CrossStageNodes.ASTNode;
+import CrossStageTools.tokenType;
 
 public abstract class DataTypeNode extends ASTNode
-{ }
+{}

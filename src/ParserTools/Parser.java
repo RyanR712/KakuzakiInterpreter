@@ -202,11 +202,13 @@ public class Parser
                 "Expected EQUAL Token after IDENTIFIER on line " + lineNumber);
 
         int negationMultiplier = matchAndRemoveNegation();
-        String valueString = determineAndCreateNumberNode(negationMultiplier).toString();
+        ASTNode numberNode = determineAndCreateNumberNode(negationMultiplier);
+        tokenType constantType = numberNode.getType();
+        String valueString = numberNode.toString();
 
         for (int i = 0; i < constants.size(); i++)
         {
-            constants.get(i).setType(tokenType.NUMBER);
+            constants.get(i).setType(constantType);
             constants.get(i).setValue(valueString);
         }
 
@@ -603,10 +605,10 @@ public class Parser
     {
         Token dataTypeToken;
         if ((dataTypeToken = matchAndRemove(tokenType.INTEGER)) != null ||
-                (dataTypeToken = matchAndRemove(tokenType.REAL)) != null ||
-                (dataTypeToken = matchAndRemove(tokenType.CHARACTER)) != null ||
-                (dataTypeToken = matchAndRemove(tokenType.STRING)) != null ||
-                (dataTypeToken = matchAndRemove(tokenType.BOOLEAN)) != null)
+            (dataTypeToken = matchAndRemove(tokenType.REAL)) != null ||
+            (dataTypeToken = matchAndRemove(tokenType.CHARACTER)) != null ||
+            (dataTypeToken = matchAndRemove(tokenType.STRING)) != null ||
+            (dataTypeToken = matchAndRemove(tokenType.BOOLEAN)) != null)
         {
             return dataTypeToken.getType();
         }

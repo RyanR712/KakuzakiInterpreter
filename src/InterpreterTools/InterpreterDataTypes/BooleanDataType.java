@@ -5,6 +5,7 @@
 package InterpreterTools.InterpreterDataTypes;
 
 import CrossStageTools.CrossStageNodes.VariableNode;
+import ParserTools.Nodes.DataTypeNodes.BooleanNode;
 
 public class BooleanDataType extends InterpreterDataType
 {
@@ -30,13 +31,22 @@ public class BooleanDataType extends InterpreterDataType
         isChangeable = changeable;
     }
 
-    public BooleanDataType(VariableNode incomingVar)
+    public BooleanDataType(VariableNode incomingVar, boolean isInitializer)
     {
-        data = Boolean.parseBoolean(incomingVar.toString());
+        data = isInitializer ? false : Boolean.parseBoolean(incomingVar.getValue());
 
         lineNumber = incomingVar.getLineNumber();
 
         isChangeable = incomingVar.isChangeable();
+    }
+
+    public BooleanDataType(BooleanNode incomingBoolean)
+    {
+        data = Boolean.parseBoolean(incomingBoolean.toString());
+
+        lineNumber = incomingBoolean.getLineNumber();
+
+        isChangeable = true;
     }
 
     @Override

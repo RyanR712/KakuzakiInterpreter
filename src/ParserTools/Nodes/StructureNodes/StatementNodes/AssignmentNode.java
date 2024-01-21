@@ -6,6 +6,7 @@ package ParserTools.Nodes.StructureNodes.StatementNodes;
 
 import CrossStageTools.CrossStageNodes.ASTNode;
 import CrossStageTools.CrossStageNodes.StatementNode;
+import CrossStageTools.tokenType;
 
 public class AssignmentNode extends StatementNode
 {
@@ -20,7 +21,7 @@ public class AssignmentNode extends StatementNode
      *
      * @param target Incoming VariableReferenceNode.
      * @param value Incoming ASTNode.
-     * @param line Incoming line number.
+     * @param line Incoming integer.
      */
     public AssignmentNode(VariableReferenceNode target, ASTNode value, int line)
     {
@@ -60,5 +61,11 @@ public class AssignmentNode extends StatementNode
     public int getLineNumber()
     {
         return lineNumber;
+    }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.ASSIGN;
     }
 }

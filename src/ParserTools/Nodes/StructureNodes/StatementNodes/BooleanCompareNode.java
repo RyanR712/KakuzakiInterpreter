@@ -122,4 +122,10 @@ public class BooleanCompareNode extends ASTNode
     {
         return 0;
     }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.NONE;
+    }
 }

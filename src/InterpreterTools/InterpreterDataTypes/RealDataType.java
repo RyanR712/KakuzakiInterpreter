@@ -5,6 +5,7 @@
 package InterpreterTools.InterpreterDataTypes;
 
 import CrossStageTools.CrossStageNodes.VariableNode;
+import ParserTools.Nodes.DataTypeNodes.RealNode;
 
 public class RealDataType extends InterpreterDataType
 {
@@ -31,13 +32,22 @@ public class RealDataType extends InterpreterDataType
         isChangeable = changeable;
     }
 
-    public RealDataType(VariableNode incomingVar)
+    public RealDataType(VariableNode incomingVar, boolean isInitializer)
     {
-        data = Float.parseFloat(incomingVar.toString());
+        data = isInitializer ? 0.0F : Float.parseFloat(incomingVar.getValue());
 
         lineNumber = incomingVar.getLineNumber();
 
         isChangeable = incomingVar.isChangeable();
+    }
+
+    public RealDataType(RealNode incomingReal)
+    {
+        data = Float.parseFloat(incomingReal.toString());
+
+        lineNumber = incomingReal.getLineNumber();
+
+        isChangeable = true;
     }
 
     @Override

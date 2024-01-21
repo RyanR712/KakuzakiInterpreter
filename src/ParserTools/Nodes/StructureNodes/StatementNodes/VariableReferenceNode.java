@@ -5,6 +5,7 @@
 package ParserTools.Nodes.StructureNodes.StatementNodes;
 
 import CrossStageTools.CrossStageNodes.ASTNode;
+import CrossStageTools.tokenType;
 
 public class VariableReferenceNode extends ASTNode
 {
@@ -65,5 +66,11 @@ public class VariableReferenceNode extends ASTNode
     public int getLineNumber()
     {
         return lineNumber;
+    }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.NONE;
     }
 }

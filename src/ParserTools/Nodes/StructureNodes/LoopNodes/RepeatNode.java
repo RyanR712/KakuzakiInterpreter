@@ -6,6 +6,7 @@ package ParserTools.Nodes.StructureNodes.LoopNodes;
 
 import java.util.ArrayList;
 
+import CrossStageTools.tokenType;
 import ParserTools.Nodes.StructureNodes.StatementNodes.BooleanCompareNode;
 import CrossStageTools.CrossStageNodes.StatementNode;
 
@@ -71,5 +72,11 @@ public class RepeatNode extends StatementNode
     public int getLineNumber()
     {
         return lineNumber;
+    }
+
+    @Override
+    public tokenType getType()
+    {
+        return tokenType.REPEAT;
     }
 }

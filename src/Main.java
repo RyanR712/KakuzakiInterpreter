@@ -87,7 +87,18 @@ public class Main
 
             Interpreter interpreter = new Interpreter(program);
 
-            interpreter.interpret();
+            try
+            {
+                interpreter.interpret();
+            }
+            catch (Exception e)
+            {
+                System.out.println("The following error was found while interpreting your program: " + e.getMessage());
+                lexer.writeDebugOutput(tokenList);
+                parser.writeDebugOutput();
+                throw new Exception("Interpreting failed.");
+            }
+
         }
     }
 

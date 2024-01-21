@@ -74,14 +74,20 @@ public class VariableNode extends ASTNode
         return name;
     }
 
-    /**
-     * Returns this VariableNode's tokenType.
-     *
-     * @return This VariableNode's tokenType.
-     */
+    @Override
     public tokenType getType()
     {
         return type;
+    }
+
+    /**
+     * Returns this VariableNode's data.
+     *
+     * @return This VariableNode's data.
+     */
+    public String getValue()
+    {
+        return value;
     }
 
     /**

@@ -140,7 +140,7 @@ public class Parser
 
         ArrayList<VariableNode> parameters = new ArrayList<>();
 
-        while (peek(0).getType() == tokenType.IDENTIFIER)
+        while (peek(0).getType() == tokenType.IDENTIFIER || peek(0).getType() == tokenType.VAR)
         {
             parameters.add(handleParameter());
         }
@@ -161,6 +161,13 @@ public class Parser
      */
     private VariableNode handleParameter() throws SyntaxErrorException
     {
+        boolean isVariable = false;
+
+        if (matchAndRemove(tokenType.VAR) != null)
+        {
+            isVariable = true;
+        }
+
         String name = matchAndRemove(tokenType.IDENTIFIER).getValue();
 
         matchAndRemoveAndTestForException(tokenType.COLON,
@@ -168,13 +175,15 @@ public class Parser
 
         tokenType variableType = matchAndRemoveAndGetDataTypeAndTestForException();
 
-        if (peek(0).getType() == tokenType.SEMICOLON && peek(1).getType() != tokenType.IDENTIFIER)
+        if (peek(0).getType() == tokenType.SEMICOLON &&
+                (peekAndGetType(1) != tokenType.IDENTIFIER && peekAndGetType(1) != tokenType.VAR))
         {
-            throw new SyntaxErrorException("Expected IDENTIFIER Token after SEMICOLON Token on " + lineNumber);
-        } else
+            throw new SyntaxErrorException("Expected IDENTIFIER or VAR Token after SEMICOLON Token on " + lineNumber);
+        }
+        else
         {
             matchAndRemove(tokenType.SEMICOLON);
-            return new VariableNode(name, variableType, lineNumber, true);
+            return new VariableNode(name, variableType, lineNumber, isVariable);
         }
     }
 

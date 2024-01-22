@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import CrossStageTools.CrossStageNodes.*;
+import CrossStageTools.tokenType;
 import Exceptions.InvalidArgumentsException;
 import Exceptions.NonexistantVariableException;
 import Exceptions.SyntaxErrorException;
@@ -42,23 +43,27 @@ public class Interpreter
 
     public void interpret() throws SyntaxErrorException
     {
-        interpretFunction(program.getFunctionMap().get("start"), new ArrayList<>());
+        interpretFunction(functionMap.get("start"), new ArrayList<>());
     }
 
-    private void interpretFunction(FunctionNode function, ArrayList<InterpreterDataType> arguments) throws SyntaxErrorException
+    private HashMap<String, InterpreterDataType> interpretFunction(FunctionNode function, ArrayList<InterpreterDataType> arguments) throws SyntaxErrorException
     {
+        HashMap<String, InterpreterDataType> localVariables = handleVariables(function);
+
         if (function instanceof BuiltInFunctionNode)
         {
             ((BuiltInFunctionNode)function).execute(arguments);
         }
         else
         {
-            HashMap<String, InterpreterDataType> localVariables = handleVariables(function);
+            handleParameters(function, localVariables);
             interpretStatements(function.getStatementList(), localVariables);
         }
+
+        return localVariables;
     }
 
-    private ArrayList<InterpreterDataType> handleParameters(
+    private void handleParameters(
             FunctionNode function, HashMap<String, InterpreterDataType> variables)
     {
         ArrayList<VariableNode> parameters = function.getParameterList();
@@ -67,10 +72,9 @@ public class Interpreter
 
         for (int i = 0; i < parameters.size(); i++)
         {
-            arguments.add(makeInterpreterDataTypeFromNode(interpretExpression(parameters.get(i), variables)));
+            arguments.add(makeInterpreterDataTypeFromVariableNode(parameters.get(i)));
             variables.put(parameters.get(i).getName(), arguments.get(i));
         }
-        return arguments;
     }
 
     private HashMap<String, InterpreterDataType> handleVariables(FunctionNode function)
@@ -200,7 +204,6 @@ public class Interpreter
         {
             throw new NonexistantVariableException(targetName, assignment.getLineNumber());
         }
-
         if (!variables.get(targetName).isChangeable())
         {
             throw new UnchangeableVariableException(targetName, assignment.getLineNumber());
@@ -219,7 +222,20 @@ public class Interpreter
 
         if (function.isVariadic() || (function.getNumberOfParameters() == calledFunction.getNumberOfArguments()))
         {
-            interpretFunction(function, handleArguments(calledFunction.getArguments(), variables));
+            ArrayList<ArgumentNode> arguments = calledFunction.getArguments();
+            ArrayList<VariableNode> parameters = function.getParameterList();
+
+            ArrayList<InterpreterDataType> values = handleArguments(arguments, variables);
+            HashMap<String, InterpreterDataType> returnedVariables = interpretFunction(function, values);
+
+            for (int i = 0; i < values.size(); i++)
+            {
+                if (!arguments.get(i).isConstant() && parameters.get(i).isChangeable())
+                {
+                    variables.replace(arguments.get(i).getVariableReference().getName(),
+                            returnedVariables.get(parameters.get(i).getName()));
+                }
+            }
         }
         else throw new InvalidArgumentsException(calledFunction.getName(), calledFunction.getLineNumber());
     }
@@ -337,6 +353,37 @@ public class Interpreter
             return new BooleanDataType((BooleanNode)incomingNode);
         }
         return null;
+    }
+
+    private InterpreterDataType makeInterpreterDataTypeFromVariableNode(VariableNode incomingNode)
+    {
+        tokenType variableType = incomingNode.getType();
+        int lineNumber = incomingNode.getLineNumber();
+
+        if (variableType == tokenType.INTEGER)
+        {
+            return new IntegerDataType(incomingNode, true);
+        }
+        else if (variableType == tokenType.REAL)
+        {
+            return new RealDataType(incomingNode, true);
+        }
+        else if (variableType == tokenType.STRING)
+        {
+            return new StringDataType(incomingNode, true);
+        }
+        else if (variableType == tokenType.CHARACTER)
+        {
+            return new CharacterDataType(incomingNode, true);
+        }
+        else if (variableType == tokenType.BOOLEAN)
+        {
+            return new BooleanDataType(incomingNode, true);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     private typeCheckResult checkTypes(ASTNode left, ASTNode right)

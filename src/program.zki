@@ -1,6 +1,17 @@
 define start()
 variables testInt: integer
+variables testReal: real
+    changeNumberSixToFiveHundred var testInt
 
-    while testInt < 100
-        write testInt
-        testInt := testInt + 5
+    write testInt, testInt, testInt
+
+    changeNumberSixToFourHundred var testInt, var testReal
+
+    write testInt, testReal
+
+define changeNumberSixToFiveHundred(var numberSix: integer)
+    numberSix := 7
+
+define changeNumberSixToFourHundred(var numberSeven: integer; var numberEight: real)
+    numberSeven := ~400
+    numberEight := 8.0

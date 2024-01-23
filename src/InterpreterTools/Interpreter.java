@@ -282,7 +282,7 @@ public class Interpreter
     private boolean interpretBooleanCompare(BooleanCompareNode comparison,
                                             HashMap<String, InterpreterDataType> variables)
     {
-        if (comparison == null) //else statements
+        if (comparison == null) //returns else statements, since they have no conditional
         {
             return true;
         }
@@ -358,7 +358,6 @@ public class Interpreter
     private InterpreterDataType makeInterpreterDataTypeFromVariableNode(VariableNode incomingNode)
     {
         tokenType variableType = incomingNode.getType();
-        int lineNumber = incomingNode.getLineNumber();
 
         if (variableType == tokenType.INTEGER)
         {

@@ -25,6 +25,13 @@ public class BooleanNode extends DataTypeNode
         lineNumber = line;
     }
 
+    public BooleanNode(tokenType incomingData, int line)
+    {
+        data = incomingData == tokenType.TRUE;
+        lineNumber = line;
+    }
+
+
     public BooleanNode(BooleanDataType bdt)
     {
         data = Boolean.parseBoolean(bdt.toString());

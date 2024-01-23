@@ -1,17 +1,12 @@
 define start()
-variables testString: string
-variables testChar: character
+variables truth: boolean
+    truth := true
 
-    testString := "alphabet"
-    testChar := 'a'
-    write "please", '_', "work", '|', "i beg you", testString, "      ", testChar, 5, 123908
+    write truth, " "
 
-    writeLine ""
+    doubleThink var truth
 
-    alterWords var testString, var testChar
+    write truth
 
-    write testString, testChar
-
-define alterWords(var testS: string; var testC: character)
-    testS := "gammadelt"
-    testC := 'o'
+define doubleThink(var incomingThought: boolean)
+    incomingThought := false

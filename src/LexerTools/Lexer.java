@@ -576,6 +576,9 @@ public class Lexer
         keywordMap.put("from", tokenType.FROM);
         keywordMap.put("to", tokenType.TO);
 
+        keywordMap.put("true", tokenType.TRUE);
+        keywordMap.put("false", tokenType.FALSE);
+
         keywordMap.put("integer", tokenType.INTEGER);
         keywordMap.put("real", tokenType.REAL);
         keywordMap.put("boolean", tokenType.BOOLEAN);

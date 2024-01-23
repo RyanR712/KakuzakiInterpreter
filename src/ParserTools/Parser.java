@@ -608,6 +608,24 @@ public class Parser
     }
 
     /**
+     * Matches and removes a TRUE or FALSE Token and returns its type.
+     *
+     * @return TRUE or FALSE tokenType.
+     * @throws SyntaxErrorException If no TRUE or FALSE Token is found.
+     */
+    private tokenType matchAndRemoveBooleanValueAndTestForException() throws SyntaxErrorException
+    {
+        Token booleanValue;
+
+        if ((booleanValue = matchAndRemove(tokenType.TRUE)) == null && (booleanValue = matchAndRemove(tokenType.FALSE)) == null)
+        {
+            throw new SyntaxErrorException("Expected TRUE Token or FALSE Token on line " + lineNumber
+                    + " but found " + peek(0) + ".");
+        }
+        else return booleanValue.getType();
+    }
+
+    /**
      * Matches, removes and returns a data type tokenType.
      *
      * @return Data type tokenType.
@@ -832,6 +850,10 @@ public class Parser
         {
             return new CharacterNode(
                     matchAndRemoveLiteralAndGetValueAndTestForException(tokenType.CHARLITERAL).charAt(0), lineNumber);
+        }
+        else if (peekAndGetType(0) == tokenType.TRUE || peekAndGetType(0) == tokenType.FALSE)
+        {
+            return new BooleanNode(matchAndRemoveBooleanValueAndTestForException(), lineNumber);
         }
         else if (peekAndGetType(0) == tokenType.IDENTIFIER)
         {

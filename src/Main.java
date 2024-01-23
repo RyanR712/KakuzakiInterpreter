@@ -45,7 +45,7 @@ public class Main
         }
         else
         {
-            ArrayList<Token> tokenList = new ArrayList<Token>();
+            ArrayList<Token> tokenList;
             Path path = Paths.get(args[0]);
             ArrayList<String> lines = (ArrayList<String>)(Files.readAllLines(path, StandardCharsets.UTF_8));
 
@@ -83,13 +83,13 @@ public class Main
                 throw new Exception("Parsing failed.");
             }
 
-            program.addMap(loadBuiltInFunctions());
+            //program.addMap(loadBuiltInFunctions());
 
-            Interpreter interpreter = new Interpreter(program);
+            //Interpreter interpreter = new Interpreter(program);
 
             try
             {
-                interpreter.interpret();
+                //interpreter.interpret();
             }
             catch (Exception e)
             {

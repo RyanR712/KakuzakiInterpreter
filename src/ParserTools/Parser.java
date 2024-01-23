@@ -257,7 +257,21 @@ public class Parser
 
         ASTNode lowerRange = null, higherRange = null;
 
-        if (dataType == tokenType.INTEGER || dataType == tokenType.REAL || dataType == tokenType.STRING)
+        if (dataType == tokenType.ARRAY)
+        {
+            matchAndRemoveAndTestForException(tokenType.FROM, "Expected FROM Token after ARRAY Token");
+
+            lowerRange = expression();
+
+            matchAndRemoveAndTestForException(tokenType.TO, "Expected TO Token after FROM Token");
+
+            higherRange = expression();
+
+            matchAndRemoveAndTestForException(tokenType.OF, "Expected OF Token after TO Token");
+
+            matchAndRemoveDataTypeToken(); //TODO: Consider if we could have an array keyword here too
+        }
+        else if (dataType == tokenType.INTEGER || dataType == tokenType.REAL || dataType == tokenType.STRING)
         {
             if (matchAndRemove(tokenType.FROM) != null)
             {
@@ -654,9 +668,10 @@ public class Parser
         Token dataTypeToken;
         if ((dataTypeToken = matchAndRemove(tokenType.INTEGER)) != null ||
             (dataTypeToken = matchAndRemove(tokenType.REAL)) != null ||
-            (dataTypeToken = matchAndRemove(tokenType.CHARACTER)) != null ||
             (dataTypeToken = matchAndRemove(tokenType.STRING)) != null ||
-            (dataTypeToken = matchAndRemove(tokenType.BOOLEAN)) != null)
+            (dataTypeToken = matchAndRemove(tokenType.CHARACTER)) != null ||
+            (dataTypeToken = matchAndRemove(tokenType.BOOLEAN)) != null ||
+            (dataTypeToken = matchAndRemove(tokenType.ARRAY)) != null)
         {
             return dataTypeToken.getType();
         }

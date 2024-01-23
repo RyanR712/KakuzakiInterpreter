@@ -573,8 +573,6 @@ public class Lexer
         keywordMap.put("repeat", tokenType.REPEAT);
         keywordMap.put("until", tokenType.UNTIL);
         keywordMap.put("for", tokenType.FOR);
-        keywordMap.put("from", tokenType.FROM);
-        keywordMap.put("to", tokenType.TO);
 
         keywordMap.put("true", tokenType.TRUE);
         keywordMap.put("false", tokenType.FALSE);
@@ -584,7 +582,11 @@ public class Lexer
         keywordMap.put("boolean", tokenType.BOOLEAN);
         keywordMap.put("character", tokenType.CHARACTER);
         keywordMap.put("string", tokenType.STRING);
+
         keywordMap.put("array", tokenType.ARRAY);
+        keywordMap.put("of", tokenType.OF);
+        keywordMap.put("from", tokenType.FROM);
+        keywordMap.put("to", tokenType.TO);
 
         keywordMap.put("var", tokenType.VAR);
     }

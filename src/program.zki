@@ -1,11 +1,6 @@
 define start()
-variables thought: boolean
-variables shouldBeOneHundred: integer
-    testForInitializeFailure 5
-
-define testForInitializeFailure(incomingInt: integer)
-    if incomingInt = 0
-        write "Total and complete failure!"
-    else
-        write "Incomplete failure!"
-    write " in testForInitializeFailure: ", incomingInt
+variables thought: array from 0 to 5 of boolean
+variables helloWorlds: array from 0 to 20 of string
+variables intsTans: array from 5 to 9 of integer
+variables realsTans: array from 3 to 4 of real
+    write 5

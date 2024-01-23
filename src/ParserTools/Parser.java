@@ -587,6 +587,27 @@ public class Parser
     }
 
     /**
+     * Matches and removes a Token of the incoming tokenType and returns its value.
+     *
+     * @param literalType Incoming tokenType.
+     * @return Removed literalType Token's value.
+     * @throws SyntaxErrorException If no Token of literalType is found.
+     */
+    private String matchAndRemoveLiteralAndGetValueAndTestForException(tokenType literalType)
+            throws SyntaxErrorException
+    {
+        String literalValue;
+
+        if ((literalValue = matchAndRemove(literalType).getValue()) == null)
+        {
+            throw new SyntaxErrorException("Expected literal Token on line " + lineNumber + " but found " + peek(0)
+                + ".");
+        }
+
+        return literalValue;
+    }
+
+    /**
      * Matches, removes and returns a data type tokenType.
      *
      * @return Data type tokenType.
@@ -730,14 +751,16 @@ public class Parser
         {
             return null;
         }
-        else if (opType == null)
+        else if (isLineEmpty() || opType == null)
         {
             return leftOperand;
         }
-        else if (peekAndGetType(0) == tokenType.MULT || peekAndGetType(0) == tokenType.DIV || peekAndGetType(0) == tokenType.MOD)
+        else if (peekAndGetType(0) == tokenType.MULT
+                || peekAndGetType(0) == tokenType.DIV || peekAndGetType(0) == tokenType.MOD)
         {
-            //fix this style when you are less tired please
-            return new MathOpNode(new MathOpNode(leftOperand, opType, rightOperand, lineNumber), handleTermOperator(), term(), lineNumber);
+            return new MathOpNode(
+                    new MathOpNode(
+                            leftOperand, opType, rightOperand, lineNumber), handleTermOperator(), term(), lineNumber);
         }
 
         return new MathOpNode(leftOperand, opType, rightOperand, lineNumber);
@@ -799,6 +822,16 @@ public class Parser
         if (peekAndGetType(0) == tokenType.NUMBER)
         {
             return determineAndCreateNumberNode(negativeMultiplier);
+        }
+        else if (peekAndGetType(0) == tokenType.STRINGLITERAL)
+        {
+            return new StringNode(matchAndRemoveLiteralAndGetValueAndTestForException(
+                    tokenType.STRINGLITERAL), lineNumber);
+        }
+        else if (peekAndGetType(0) == tokenType.CHARLITERAL)
+        {
+            return new CharacterNode(
+                    matchAndRemoveLiteralAndGetValueAndTestForException(tokenType.CHARLITERAL).charAt(0), lineNumber);
         }
         else if (peekAndGetType(0) == tokenType.IDENTIFIER)
         {

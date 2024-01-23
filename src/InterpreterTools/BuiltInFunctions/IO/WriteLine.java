@@ -1,22 +1,23 @@
 /**
- * Describes the builtin function for writing data to STDOut.
+ * Describes the builtin function for writing data to STDOut with \n formatting.
  */
 
 package InterpreterTools.BuiltInFunctions.IO;
 
-import java.util.ArrayList;
-
 import InterpreterTools.BuiltInFunctions.BuiltInFunctionNode;
 import InterpreterTools.InterpreterDataTypes.InterpreterDataType;
 
-public class Write extends BuiltInFunctionNode
+import java.util.ArrayList;
+
+public class WriteLine extends BuiltInFunctionNode
 {
     /**
-     * Creates the builtin function write, which takes <i>n</i> arguments and writes them to STDOut.
+     * Creates the builtin function writeLine, which takes <i>n</i> arguments
+     * and writes them to STDOut with \n formatting.
      */
-    public Write()
+    public WriteLine()
     {
-        super("write", true, new ArrayList<>());
+        super("writeLine", true, new ArrayList<>());
     }
 
     @Override
@@ -24,7 +25,7 @@ public class Write extends BuiltInFunctionNode
     {
         for (int i = 0; i < args.size(); i++)
         {
-            System.out.print(args.get(i));
+            System.out.println(args.get(i));
         }
     }
 

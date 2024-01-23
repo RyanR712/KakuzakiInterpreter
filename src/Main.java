@@ -116,6 +116,7 @@ public class Main
 
         builtInMap.put("read", new Read());
         builtInMap.put("write", new Write());
+        builtInMap.put("writeLine", new WriteLine());
 
         builtInMap.put("getRandom", new GetRandom());
         builtInMap.put("integerToReal", new IntegerToReal());

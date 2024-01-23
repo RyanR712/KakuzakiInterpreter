@@ -1,17 +1,17 @@
 define start()
-variables testInt: integer
-variables testReal: real
-    changeNumberSixToFiveHundred var testInt
+variables testString: string
+variables testChar: character
 
-    write testInt, testInt, testInt
+    testString := "alphabet"
+    testChar := 'a'
+    write "please", '_', "work", '|', "i beg you", testString, "      ", testChar, 5, 123908
 
-    changeNumberSixToFourHundred var testInt, var testReal
+    writeLine ""
 
-    write testInt, testReal
+    alterWords var testString, var testChar
 
-define changeNumberSixToFiveHundred(var numberSix: integer)
-    numberSix := 7
+    write testString, testChar
 
-define changeNumberSixToFourHundred(var numberSeven: integer; var numberEight: real)
-    numberSeven := ~400
-    numberEight := 8.0
+define alterWords(var testS: string; var testC: character)
+    testS := "gammadelt"
+    testC := 'o'

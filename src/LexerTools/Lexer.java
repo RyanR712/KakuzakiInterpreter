@@ -363,9 +363,9 @@ public class Lexer
      */
     private int handleCharacterLiteral(String currentLine, int currentIndex) throws Exception
     {
-        final int TOTAL_CHARACTER_LITERAL_LENGTH = 3;
+        final int TOTAL_CHARACTER_LITERAL_LENGTH = 2;
         char currentChar = currentLine.charAt(currentIndex + 1);
-        if (peekAhead(currentLine, currentIndex + TOTAL_CHARACTER_LITERAL_LENGTH - 1) != '\'')
+        if (peekAhead(currentLine, currentIndex + TOTAL_CHARACTER_LITERAL_LENGTH) != '\'')
         {
             throw new SyntaxErrorException("Unenclosed or too large character literal on line " + lineNumber + ".");
         }

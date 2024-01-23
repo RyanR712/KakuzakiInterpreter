@@ -56,7 +56,7 @@ public class Interpreter
         }
         else
         {
-            handleParameters(function, localVariables);
+            handleParameters(function, arguments, localVariables);
             interpretStatements(function.getStatementList(), localVariables);
         }
 
@@ -64,15 +64,14 @@ public class Interpreter
     }
 
     private void handleParameters(
-            FunctionNode function, HashMap<String, InterpreterDataType> variables)
+            FunctionNode function, ArrayList<InterpreterDataType> arguments,
+            HashMap<String, InterpreterDataType> variables)
     {
         ArrayList<VariableNode> parameters = function.getParameterList();
 
-        ArrayList<InterpreterDataType> arguments = new ArrayList<>();
-
         for (int i = 0; i < parameters.size(); i++)
         {
-            arguments.add(makeInterpreterDataTypeFromVariableNode(parameters.get(i)));
+            arguments.add(makeInterpreterDataTypeFromVariableNode(parameters.get(i))); //need to make parameters have values from passed in args
             variables.put(parameters.get(i).getName(), arguments.get(i));
         }
     }
@@ -152,7 +151,7 @@ public class Interpreter
         {
             interpretStatements(ifBlock.getStatements(), variables);
         }
-        else
+        else if (ifBlock.hasNext())
         {
             interpretIf(ifBlock.getNext(), variables);
         }
@@ -228,7 +227,7 @@ public class Interpreter
             ArrayList<InterpreterDataType> values = handleArguments(arguments, variables);
             HashMap<String, InterpreterDataType> returnedVariables = interpretFunction(function, values);
 
-            for (int i = 0; i < values.size(); i++)
+            for (int i = 0; i < arguments.size(); i++)
             {
                 if (!arguments.get(i).isConstant() && parameters.get(i).isChangeable())
                 {
@@ -539,6 +538,10 @@ public class Interpreter
             else if (compType == comparisonType.AND)
             {
                 result = leftBoolean && rightBoolean;
+            }
+            else if (compType == comparisonType.EQUAL)
+            {
+                result = leftBoolean == rightBoolean;
             }
             return result;
         }

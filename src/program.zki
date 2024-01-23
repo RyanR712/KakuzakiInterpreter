@@ -1,12 +1,11 @@
 define start()
-variables truth: boolean
-    truth := true
+variables thought: boolean
+variables shouldBeOneHundred: integer
+    testForInitializeFailure 5
 
-    write truth, " "
-
-    doubleThink var truth
-
-    write truth
-
-define doubleThink(var incomingThought: boolean)
-    incomingThought := false
+define testForInitializeFailure(incomingInt: integer)
+    if incomingInt = 0
+        write "Total and complete failure!"
+    else
+        write "Incomplete failure!"
+    write " in testForInitializeFailure: ", incomingInt

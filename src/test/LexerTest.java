@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 
-import LexerTools.Lexer;
+import Lexer.Lexer;
 import CrossStageTools.Token;
 
 public class LexerTest

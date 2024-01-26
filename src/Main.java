@@ -15,16 +15,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 
-import CrossStageTools.CrossStageNodes.FunctionNode;
+import CrossStageTools.Nodes.FunctionNode;
 import CrossStageTools.Token;
-import InterpreterTools.BuiltInFunctions.Arrays.*;
-import InterpreterTools.BuiltInFunctions.IO.*;
-import InterpreterTools.BuiltInFunctions.Numbers.*;
-import InterpreterTools.BuiltInFunctions.Strings.*;
-import InterpreterTools.Interpreter;
-import LexerTools.Lexer;
-import CrossStageTools.CrossStageNodes.ProgramNode;
-import ParserTools.Parser;
+import Interpreter.BuiltInFunctions.Arrays.*;
+import Interpreter.BuiltInFunctions.IO.*;
+import Interpreter.BuiltInFunctions.Numbers.*;
+import Interpreter.BuiltInFunctions.Strings.*;
+import Lexer.Lexer;
+import CrossStageTools.Nodes.ProgramNode;
+import Parser.Parser;
 
 public class Main
 {

@@ -4,38 +4,68 @@
 
 package InterpreterTools.InterpreterDataTypes;
 
+import CrossStageTools.CrossStageNodes.ASTNode;
+import CrossStageTools.CrossStageNodes.VariableNode;
+import CrossStageTools.tokenType;
+
 public class ArrayDataType extends InterpreterDataType
 {
-    private final InterpreterDataType[] data;
+    private InterpreterDataType[] data;
 
     private final int lineNumber;
 
     private final boolean isChangeable;
 
-    /**
-     * Creates an ArrayDataType with the incoming InterpreterDataType array as its data,
-     * the incoming int as its line number and the incoming boolean as whether this ArrayDataType is changeable.
-     *
-     * @param incomingData Incoming InterpreterDataType array.
-     * @param line Incoming int.
-     * @param changeable Incoming boolean.
-     */
-    public ArrayDataType(InterpreterDataType[] incomingData, int line, boolean changeable)
+    private final tokenType typeOfData;
+
+    public ArrayDataType(VariableNode incomingVar, boolean isInitializer)
     {
-        data = incomingData;
+        int lower = Integer.parseInt(incomingVar.getLowerRange().toString());
+        int higher = Integer.parseInt(incomingVar.getHigherRange().toString());
 
-        lineNumber = line;
+        for (int i = lower; i < higher; i++)
+        {
+            data[i] = makeNodeFromTokenType(incomingVar, incomingVar.getType());
+        }
 
-        isChangeable = changeable;
+        lineNumber = incomingVar.getLineNumber();
+
+        isChangeable = isInitializer;
+
+        typeOfData = incomingVar.getType();
+    }
+
+    private InterpreterDataType makeNodeFromTokenType(VariableNode incomingVar, tokenType arrayType)
+    {
+        switch (arrayType)
+        {
+            case INTEGER   : return new IntegerDataType(incomingVar, true);
+            case REAL      : return new RealDataType(incomingVar, true);
+            case STRING    : return new StringDataType(incomingVar, true);
+            case CHARACTER : return new CharacterDataType(incomingVar, true);
+            case BOOLEAN   : return new BooleanDataType(incomingVar, true);
+            default        : return null;
+        }
     }
 
     /**
      * Returns this ArrayDataType's data.
+     *
      * @return This ArrayDataType's data.
      */
     public InterpreterDataType[] getData()
     {
         return data;
+    }
+
+    /**
+     * Returns the data type shared by all InterpreterDataTypes in this ArrayDataType.
+     *
+     * @return Data type shared by all InterpreterDataTypes in this ArrayDataType.
+     */
+    public tokenType getTypeOfData()
+    {
+        return typeOfData;
     }
 
     @Override

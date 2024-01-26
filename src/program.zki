@@ -3,4 +3,4 @@ variables thought: array from 0 to 5 of boolean
 variables helloWorlds: array from 0 to 20 of string
 variables intsTans: array from 5 to 9 of integer
 variables realsTans: array from 3 to 4 of real
-    write 5
+    write helloWorlds[10], thought[3]
